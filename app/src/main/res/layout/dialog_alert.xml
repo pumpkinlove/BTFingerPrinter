@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@color/white"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:layout_margin="1dp"
+            android:text="指纹id"
+            android:layout_width="0dp"
+            android:layout_height="55dp"
+            android:layout_weight="1"
+            android:textColor="@color/dark"
+            android:textSize="16sp"
+            android:gravity="center"/>
+
+        <EditText
+            android:id="@+id/et_finger_id"
+            android:layout_margin="1dp"
+            android:inputType="number"
+            android:digits="0123456789"
+            android:maxLength="1"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="55dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/btn_confirm"
+            android:text="确定"
+            style="@style/button_order"
+            android:layout_weight="1"
+            android:layout_margin="1dp"
+            android:layout_width="0dp"
+            android:layout_height="45dp" />
+
+        <Button
+            android:id="@+id/btn_cancel"
+            android:layout_margin="1dp"
+            android:text="取消"
+            style="@style/button_order"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="45dp" />
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">蓝牙指纹打印机</string>
+    <string name="MainActivity_title">设备列表</string>
+    <string name="CardInfoActivity_title">蓝牙指纹打印机</string>
+    <string name="search">搜索</string>
+    <string name="searching">正在搜索…</string>
+</resources>
