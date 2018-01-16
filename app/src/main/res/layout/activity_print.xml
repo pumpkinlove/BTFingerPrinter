@@ -2,10 +2,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:background="@color/gray_bg"
+    android:padding="@dimen/main_padding"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <ScrollView
+        android:visibility="gone"
         android:id="@+id/sv_message"
         android:background="@color/white"
         android:layout_width="match_parent"
@@ -25,6 +27,7 @@
         android:layout_height="1px"/>
 
     <FrameLayout
+        android:visibility="gone"
         android:id="@+id/fl_main"
         android:layout_weight="4"
         android:layout_width="match_parent"
@@ -37,40 +40,28 @@
         android:layout_width="match_parent"
         android:layout_height="1px"/>
 
-    <ScrollView
+    <LinearLayout
+        android:id="@+id/ll_buttons"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <LinearLayout
-            android:id="@+id/ll_buttons"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+        <Button
+            style="@style/button_order"
+            android:id="@+id/btn_reg_finger"
+            android:text="@string/register" />
 
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+        <Button
+            style="@style/button_order"
+            android:id="@+id/btn_search_finger"
+            android:text="@string/verify" />
 
-                <Button
-                    style="@style/button_order"
-                    android:id="@+id/btn_reg_finger"
-                    android:text="Register" />
+        <Button
+            style="@style/button_order"
+            android:id="@+id/btn_user_manage"
+            android:text="@string/user_manage" />
 
-                <Button
-                    style="@style/button_order"
-                    android:id="@+id/btn_search_finger"
-                    android:text="Verify" />
-
-                <Button
-                    style="@style/button_order"
-                    android:id="@+id/btn_user_manage"
-                    android:text="User Manage" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-    </ScrollView>
+    </LinearLayout>
 
 
 </LinearLayout>

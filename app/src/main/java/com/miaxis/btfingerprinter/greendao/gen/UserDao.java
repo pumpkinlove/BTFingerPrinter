@@ -26,16 +26,16 @@ public class UserDao extends AbstractDao<User, Long> {
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property Name = new Property(1, String.class, "name", false, "NAME");
-        public final static Property Finger0 = new Property(2, byte[].class, "finger0", false, "FINGER0");
-        public final static Property Finger1 = new Property(3, byte[].class, "finger1", false, "FINGER1");
-        public final static Property Finger2 = new Property(4, byte[].class, "finger2", false, "FINGER2");
-        public final static Property Finger3 = new Property(5, byte[].class, "finger3", false, "FINGER3");
-        public final static Property Finger4 = new Property(6, byte[].class, "finger4", false, "FINGER4");
-        public final static Property Finger5 = new Property(7, byte[].class, "finger5", false, "FINGER5");
-        public final static Property Finger6 = new Property(8, byte[].class, "finger6", false, "FINGER6");
-        public final static Property Finger7 = new Property(9, byte[].class, "finger7", false, "FINGER7");
-        public final static Property Finger8 = new Property(10, byte[].class, "finger8", false, "FINGER8");
-        public final static Property Finger9 = new Property(11, byte[].class, "finger9", false, "FINGER9");
+        public final static Property Finger1 = new Property(2, byte[].class, "finger1", false, "FINGER1");
+        public final static Property Finger2 = new Property(3, byte[].class, "finger2", false, "FINGER2");
+        public final static Property Finger3 = new Property(4, byte[].class, "finger3", false, "FINGER3");
+        public final static Property Finger4 = new Property(5, byte[].class, "finger4", false, "FINGER4");
+        public final static Property Finger5 = new Property(6, byte[].class, "finger5", false, "FINGER5");
+        public final static Property Finger6 = new Property(7, byte[].class, "finger6", false, "FINGER6");
+        public final static Property Finger7 = new Property(8, byte[].class, "finger7", false, "FINGER7");
+        public final static Property Finger8 = new Property(9, byte[].class, "finger8", false, "FINGER8");
+        public final static Property Finger9 = new Property(10, byte[].class, "finger9", false, "FINGER9");
+        public final static Property Finger10 = new Property(11, byte[].class, "finger10", false, "FINGER10");
     }
 
 
@@ -53,16 +53,16 @@ public class UserDao extends AbstractDao<User, Long> {
         db.execSQL("CREATE TABLE " + constraint + "\"USER\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
                 "\"NAME\" TEXT," + // 1: name
-                "\"FINGER0\" BLOB," + // 2: finger0
-                "\"FINGER1\" BLOB," + // 3: finger1
-                "\"FINGER2\" BLOB," + // 4: finger2
-                "\"FINGER3\" BLOB," + // 5: finger3
-                "\"FINGER4\" BLOB," + // 6: finger4
-                "\"FINGER5\" BLOB," + // 7: finger5
-                "\"FINGER6\" BLOB," + // 8: finger6
-                "\"FINGER7\" BLOB," + // 9: finger7
-                "\"FINGER8\" BLOB," + // 10: finger8
-                "\"FINGER9\" BLOB);"); // 11: finger9
+                "\"FINGER1\" BLOB," + // 2: finger1
+                "\"FINGER2\" BLOB," + // 3: finger2
+                "\"FINGER3\" BLOB," + // 4: finger3
+                "\"FINGER4\" BLOB," + // 5: finger4
+                "\"FINGER5\" BLOB," + // 6: finger5
+                "\"FINGER6\" BLOB," + // 7: finger6
+                "\"FINGER7\" BLOB," + // 8: finger7
+                "\"FINGER8\" BLOB," + // 9: finger8
+                "\"FINGER9\" BLOB," + // 10: finger9
+                "\"FINGER10\" BLOB);"); // 11: finger10
     }
 
     /** Drops the underlying database table. */
@@ -85,54 +85,54 @@ public class UserDao extends AbstractDao<User, Long> {
             stmt.bindString(2, name);
         }
  
-        byte[] finger0 = entity.getFinger0();
-        if (finger0 != null) {
-            stmt.bindBlob(3, finger0);
-        }
- 
         byte[] finger1 = entity.getFinger1();
         if (finger1 != null) {
-            stmt.bindBlob(4, finger1);
+            stmt.bindBlob(3, finger1);
         }
  
         byte[] finger2 = entity.getFinger2();
         if (finger2 != null) {
-            stmt.bindBlob(5, finger2);
+            stmt.bindBlob(4, finger2);
         }
  
         byte[] finger3 = entity.getFinger3();
         if (finger3 != null) {
-            stmt.bindBlob(6, finger3);
+            stmt.bindBlob(5, finger3);
         }
  
         byte[] finger4 = entity.getFinger4();
         if (finger4 != null) {
-            stmt.bindBlob(7, finger4);
+            stmt.bindBlob(6, finger4);
         }
  
         byte[] finger5 = entity.getFinger5();
         if (finger5 != null) {
-            stmt.bindBlob(8, finger5);
+            stmt.bindBlob(7, finger5);
         }
  
         byte[] finger6 = entity.getFinger6();
         if (finger6 != null) {
-            stmt.bindBlob(9, finger6);
+            stmt.bindBlob(8, finger6);
         }
  
         byte[] finger7 = entity.getFinger7();
         if (finger7 != null) {
-            stmt.bindBlob(10, finger7);
+            stmt.bindBlob(9, finger7);
         }
  
         byte[] finger8 = entity.getFinger8();
         if (finger8 != null) {
-            stmt.bindBlob(11, finger8);
+            stmt.bindBlob(10, finger8);
         }
  
         byte[] finger9 = entity.getFinger9();
         if (finger9 != null) {
-            stmt.bindBlob(12, finger9);
+            stmt.bindBlob(11, finger9);
+        }
+ 
+        byte[] finger10 = entity.getFinger10();
+        if (finger10 != null) {
+            stmt.bindBlob(12, finger10);
         }
     }
 
@@ -150,54 +150,54 @@ public class UserDao extends AbstractDao<User, Long> {
             stmt.bindString(2, name);
         }
  
-        byte[] finger0 = entity.getFinger0();
-        if (finger0 != null) {
-            stmt.bindBlob(3, finger0);
-        }
- 
         byte[] finger1 = entity.getFinger1();
         if (finger1 != null) {
-            stmt.bindBlob(4, finger1);
+            stmt.bindBlob(3, finger1);
         }
  
         byte[] finger2 = entity.getFinger2();
         if (finger2 != null) {
-            stmt.bindBlob(5, finger2);
+            stmt.bindBlob(4, finger2);
         }
  
         byte[] finger3 = entity.getFinger3();
         if (finger3 != null) {
-            stmt.bindBlob(6, finger3);
+            stmt.bindBlob(5, finger3);
         }
  
         byte[] finger4 = entity.getFinger4();
         if (finger4 != null) {
-            stmt.bindBlob(7, finger4);
+            stmt.bindBlob(6, finger4);
         }
  
         byte[] finger5 = entity.getFinger5();
         if (finger5 != null) {
-            stmt.bindBlob(8, finger5);
+            stmt.bindBlob(7, finger5);
         }
  
         byte[] finger6 = entity.getFinger6();
         if (finger6 != null) {
-            stmt.bindBlob(9, finger6);
+            stmt.bindBlob(8, finger6);
         }
  
         byte[] finger7 = entity.getFinger7();
         if (finger7 != null) {
-            stmt.bindBlob(10, finger7);
+            stmt.bindBlob(9, finger7);
         }
  
         byte[] finger8 = entity.getFinger8();
         if (finger8 != null) {
-            stmt.bindBlob(11, finger8);
+            stmt.bindBlob(10, finger8);
         }
  
         byte[] finger9 = entity.getFinger9();
         if (finger9 != null) {
-            stmt.bindBlob(12, finger9);
+            stmt.bindBlob(11, finger9);
+        }
+ 
+        byte[] finger10 = entity.getFinger10();
+        if (finger10 != null) {
+            stmt.bindBlob(12, finger10);
         }
     }
 
@@ -211,16 +211,16 @@ public class UserDao extends AbstractDao<User, Long> {
         User entity = new User( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // name
-            cursor.isNull(offset + 2) ? null : cursor.getBlob(offset + 2), // finger0
-            cursor.isNull(offset + 3) ? null : cursor.getBlob(offset + 3), // finger1
-            cursor.isNull(offset + 4) ? null : cursor.getBlob(offset + 4), // finger2
-            cursor.isNull(offset + 5) ? null : cursor.getBlob(offset + 5), // finger3
-            cursor.isNull(offset + 6) ? null : cursor.getBlob(offset + 6), // finger4
-            cursor.isNull(offset + 7) ? null : cursor.getBlob(offset + 7), // finger5
-            cursor.isNull(offset + 8) ? null : cursor.getBlob(offset + 8), // finger6
-            cursor.isNull(offset + 9) ? null : cursor.getBlob(offset + 9), // finger7
-            cursor.isNull(offset + 10) ? null : cursor.getBlob(offset + 10), // finger8
-            cursor.isNull(offset + 11) ? null : cursor.getBlob(offset + 11) // finger9
+            cursor.isNull(offset + 2) ? null : cursor.getBlob(offset + 2), // finger1
+            cursor.isNull(offset + 3) ? null : cursor.getBlob(offset + 3), // finger2
+            cursor.isNull(offset + 4) ? null : cursor.getBlob(offset + 4), // finger3
+            cursor.isNull(offset + 5) ? null : cursor.getBlob(offset + 5), // finger4
+            cursor.isNull(offset + 6) ? null : cursor.getBlob(offset + 6), // finger5
+            cursor.isNull(offset + 7) ? null : cursor.getBlob(offset + 7), // finger6
+            cursor.isNull(offset + 8) ? null : cursor.getBlob(offset + 8), // finger7
+            cursor.isNull(offset + 9) ? null : cursor.getBlob(offset + 9), // finger8
+            cursor.isNull(offset + 10) ? null : cursor.getBlob(offset + 10), // finger9
+            cursor.isNull(offset + 11) ? null : cursor.getBlob(offset + 11) // finger10
         );
         return entity;
     }
@@ -229,16 +229,16 @@ public class UserDao extends AbstractDao<User, Long> {
     public void readEntity(Cursor cursor, User entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setName(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setFinger0(cursor.isNull(offset + 2) ? null : cursor.getBlob(offset + 2));
-        entity.setFinger1(cursor.isNull(offset + 3) ? null : cursor.getBlob(offset + 3));
-        entity.setFinger2(cursor.isNull(offset + 4) ? null : cursor.getBlob(offset + 4));
-        entity.setFinger3(cursor.isNull(offset + 5) ? null : cursor.getBlob(offset + 5));
-        entity.setFinger4(cursor.isNull(offset + 6) ? null : cursor.getBlob(offset + 6));
-        entity.setFinger5(cursor.isNull(offset + 7) ? null : cursor.getBlob(offset + 7));
-        entity.setFinger6(cursor.isNull(offset + 8) ? null : cursor.getBlob(offset + 8));
-        entity.setFinger7(cursor.isNull(offset + 9) ? null : cursor.getBlob(offset + 9));
-        entity.setFinger8(cursor.isNull(offset + 10) ? null : cursor.getBlob(offset + 10));
-        entity.setFinger9(cursor.isNull(offset + 11) ? null : cursor.getBlob(offset + 11));
+        entity.setFinger1(cursor.isNull(offset + 2) ? null : cursor.getBlob(offset + 2));
+        entity.setFinger2(cursor.isNull(offset + 3) ? null : cursor.getBlob(offset + 3));
+        entity.setFinger3(cursor.isNull(offset + 4) ? null : cursor.getBlob(offset + 4));
+        entity.setFinger4(cursor.isNull(offset + 5) ? null : cursor.getBlob(offset + 5));
+        entity.setFinger5(cursor.isNull(offset + 6) ? null : cursor.getBlob(offset + 6));
+        entity.setFinger6(cursor.isNull(offset + 7) ? null : cursor.getBlob(offset + 7));
+        entity.setFinger7(cursor.isNull(offset + 8) ? null : cursor.getBlob(offset + 8));
+        entity.setFinger8(cursor.isNull(offset + 9) ? null : cursor.getBlob(offset + 9));
+        entity.setFinger9(cursor.isNull(offset + 10) ? null : cursor.getBlob(offset + 10));
+        entity.setFinger10(cursor.isNull(offset + 11) ? null : cursor.getBlob(offset + 11));
      }
     
     @Override

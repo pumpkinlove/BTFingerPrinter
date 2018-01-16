@@ -16,7 +16,7 @@
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="60dp">
+            android:layout_height="50dp">
 
             <TextView
                 android:id="@+id/tv_userId"
@@ -53,7 +53,7 @@
             android:id="@+id/tv_finger_count"
             android:gravity="center"
             android:layout_width="match_parent"
-            android:layout_height="50dp" />
+            android:layout_height="45dp" />
 
         <View
             android:background="@color/gray_light"
@@ -67,66 +67,51 @@
             android:layout_height="wrap_content">
 
             <Button
-                android:textColor="@color/dark"
-                android:background="@drawable/white_btn_bg"
-                android:layout_columnWeight="1"
+                style="@style/button_finger"
                 android:text="Finger 1"/>
 
             <Button
-                android:textColor="@color/dark"
-                android:background="@drawable/white_btn_bg"
-                android:layout_columnWeight="1"
+                style="@style/button_finger"
                 android:text="Finger 2"/>
 
             <Button
-                android:textColor="@color/dark"
-                android:background="@drawable/white_btn_bg"
-                android:layout_columnWeight="1"
+                style="@style/button_finger"
                 android:text="Finger 3"/>
 
             <Button
-                android:textColor="@color/dark"
-                android:background="@drawable/white_btn_bg"
-                android:layout_columnWeight="1"
+                style="@style/button_finger"
                 android:text="Finger 4"/>
 
             <Button
-                android:textColor="@color/dark"
-                android:background="@drawable/white_btn_bg"
-                android:layout_columnWeight="1"
+                style="@style/button_finger"
                 android:text="Finger 5"/>
 
             <Button
-                android:textColor="@color/dark"
-                android:background="@drawable/white_btn_bg"
-                android:layout_columnWeight="1"
+                style="@style/button_finger"
                 android:text="Finger 6"/>
 
             <Button
-                android:textColor="@color/dark"
-                android:background="@drawable/white_btn_bg"
-                android:layout_columnWeight="1"
+                style="@style/button_finger"
                 android:text="Finger 7"/>
 
             <Button
-                android:textColor="@color/dark"
-                android:background="@drawable/white_btn_bg"
-                android:layout_columnWeight="1"
+                style="@style/button_finger"
                 android:text="Finger 8"/>
 
             <Button
-                android:textColor="@color/dark"
-                android:background="@drawable/white_btn_bg"
-                android:layout_columnWeight="1"
+                style="@style/button_finger"
                 android:text="Finger 9"/>
 
             <Button
-                android:textColor="@color/dark"
-                android:background="@drawable/white_btn_bg"
-                android:layout_columnWeight="1"
+                style="@style/button_finger"
                 android:text="Finger 10"/>
 
         </GridLayout>
+
+        <View
+            android:background="@color/gray_light"
+            android:layout_width="match_parent"
+            android:layout_height="1px"/>
 
         <LinearLayout
             android:orientation="horizontal"
@@ -135,8 +120,8 @@
 
             <Button
                 android:id="@+id/btn_modify"
-                android:background="@drawable/orange_btn_bg"
-                android:textColor="@color/white"
+                android:background="@drawable/white_btn_bg"
+                android:textColor="@color/orange_dark"
                 android:text="@string/modify"
                 android:layout_weight="1"
                 android:layout_width="0dp"
@@ -149,8 +134,8 @@
 
             <Button
                 android:id="@+id/btn_delete"
-                android:background="@drawable/red_btn_bg"
-                android:textColor="@color/white"
+                android:background="@drawable/white_btn_bg"
+                android:textColor="@color/light_red2"
                 android:text="@string/delete"
                 android:layout_weight="1"
                 android:layout_width="0dp"

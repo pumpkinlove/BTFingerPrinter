@@ -1,148 +1,139 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@null"
-    app:cardElevation="5dp"
-    app:cardCornerRadius="5dp">
+    android:layout_height="wrap_content">
 
     <LinearLayout
-        android:orientation="vertical"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="60dp">
+
+        <TextView
+            android:visibility="gone"
+            android:id="@+id/tv_userId"
+            android:hint="ID"
+            android:textSize="20sp"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+
+        <EditText
+            android:id="@+id/et_username"
+            android:hint="Username"
+            android:background="@null"
+            android:gravity="center"
+            android:layout_weight="3"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
+
+    <View
+        android:background="@color/gray_light"
+        android:layout_width="match_parent"
+        android:layout_height="1px"/>
+
+    <GridLayout
+        android:id="@+id/gl_fingers"
+        android:columnCount="2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="60dp">
+        <Button
+            android:textColor="@color/dark"
+            android:background="@drawable/white_btn_bg"
+            android:layout_columnWeight="1"
+            android:text="Finger 1"/>
 
-            <TextView
-                android:visibility="gone"
-                android:id="@+id/tv_userId"
-                android:hint="ID"
-                android:textSize="20sp"
-                android:gravity="center"
-                android:layout_weight="1"
-                android:layout_width="0dp"
-                android:layout_height="match_parent" />
+        <Button
+            android:textColor="@color/dark"
+            android:background="@drawable/white_btn_bg"
+            android:layout_columnWeight="1"
+            android:text="Finger 2"/>
 
-            <EditText
-                android:id="@+id/et_username"
-                android:hint="Username"
-                android:background="@null"
-                android:gravity="center"
-                android:layout_weight="3"
-                android:layout_width="0dp"
-                android:layout_height="match_parent" />
+        <Button
+            android:textColor="@color/dark"
+            android:background="@drawable/white_btn_bg"
+            android:layout_columnWeight="1"
+            android:text="Finger 3"/>
 
-        </LinearLayout>
+        <Button
+            android:textColor="@color/dark"
+            android:background="@drawable/white_btn_bg"
+            android:layout_columnWeight="1"
+            android:text="Finger 4"/>
+
+        <Button
+            android:textColor="@color/dark"
+            android:background="@drawable/white_btn_bg"
+            android:layout_columnWeight="1"
+            android:text="Finger 5"/>
+
+        <Button
+            android:textColor="@color/dark"
+            android:background="@drawable/white_btn_bg"
+            android:layout_columnWeight="1"
+            android:text="Finger 6"/>
+
+        <Button
+            android:textColor="@color/dark"
+            android:background="@drawable/white_btn_bg"
+            android:layout_columnWeight="1"
+            android:text="Finger 7"/>
+
+        <Button
+            android:textColor="@color/dark"
+            android:background="@drawable/white_btn_bg"
+            android:layout_columnWeight="1"
+            android:text="Finger 8"/>
+
+        <Button
+            android:textColor="@color/dark"
+            android:background="@drawable/white_btn_bg"
+            android:layout_columnWeight="1"
+            android:text="Finger 9"/>
+
+        <Button
+            android:textColor="@color/dark"
+            android:background="@drawable/white_btn_bg"
+            android:layout_columnWeight="1"
+            android:text="Finger 10"/>
+
+    </GridLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/btn_confirm"
+            android:background="@drawable/blue_btn_bg"
+            android:textColor="@color/white"
+            android:text="@string/confirm"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="50dp" />
 
         <View
             android:background="@color/gray_light"
-            android:layout_width="match_parent"
-            android:layout_height="1px"/>
+            android:layout_width="1px"
+            android:layout_height="match_parent"/>
 
-        <GridLayout
-            android:id="@+id/gl_fingers"
-            android:columnCount="2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <Button
-                android:textColor="@color/dark"
-                android:background="@drawable/white_btn_bg"
-                android:layout_columnWeight="1"
-                android:text="Finger 1"/>
-
-            <Button
-                android:textColor="@color/dark"
-                android:background="@drawable/white_btn_bg"
-                android:layout_columnWeight="1"
-                android:text="Finger 2"/>
-
-            <Button
-                android:textColor="@color/dark"
-                android:background="@drawable/white_btn_bg"
-                android:layout_columnWeight="1"
-                android:text="Finger 3"/>
-
-            <Button
-                android:textColor="@color/dark"
-                android:background="@drawable/white_btn_bg"
-                android:layout_columnWeight="1"
-                android:text="Finger 4"/>
-
-            <Button
-                android:textColor="@color/dark"
-                android:background="@drawable/white_btn_bg"
-                android:layout_columnWeight="1"
-                android:text="Finger 5"/>
-
-            <Button
-                android:textColor="@color/dark"
-                android:background="@drawable/white_btn_bg"
-                android:layout_columnWeight="1"
-                android:text="Finger 6"/>
-
-            <Button
-                android:textColor="@color/dark"
-                android:background="@drawable/white_btn_bg"
-                android:layout_columnWeight="1"
-                android:text="Finger 7"/>
-
-            <Button
-                android:textColor="@color/dark"
-                android:background="@drawable/white_btn_bg"
-                android:layout_columnWeight="1"
-                android:text="Finger 8"/>
-
-            <Button
-                android:textColor="@color/dark"
-                android:background="@drawable/white_btn_bg"
-                android:layout_columnWeight="1"
-                android:text="Finger 9"/>
-
-            <Button
-                android:textColor="@color/dark"
-                android:background="@drawable/white_btn_bg"
-                android:layout_columnWeight="1"
-                android:text="Finger 10"/>
-
-        </GridLayout>
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <Button
-                android:id="@+id/btn_confirm"
-                android:background="@drawable/blue_btn_bg"
-                android:textColor="@color/white"
-                android:text="@string/confirm"
-                android:layout_weight="1"
-                android:layout_width="0dp"
-                android:layout_height="50dp" />
-
-            <View
-                android:background="@color/gray_light"
-                android:layout_width="1px"
-                android:layout_height="match_parent"/>
-
-            <Button
-                android:id="@+id/btn_cancel"
-                android:background="@drawable/blue_btn_bg"
-                android:textColor="@color/white"
-                android:text="@string/cancel"
-                android:layout_weight="1"
-                android:layout_width="0dp"
-                android:layout_height="50dp" />
-
-        </LinearLayout>
-
+        <Button
+            android:id="@+id/btn_cancel"
+            android:background="@drawable/blue_btn_bg"
+            android:textColor="@color/white"
+            android:text="@string/cancel"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="50dp" />
 
     </LinearLayout>
 
 
-</android.support.v7.widget.CardView>
+</LinearLayout>
+

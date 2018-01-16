@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.GridLayout;
 import android.widget.GridView;
 import android.widget.TextView;
 
@@ -15,6 +16,7 @@ import com.miaxis.btfingerprinter.bean.User;
 
 import java.util.List;
 
+import butterknife.BindColor;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -60,7 +62,6 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         return 0;
     }
 
-
     public interface UserManageListener {
         //返回值判断事件是否传递
         boolean onModify(int position);
@@ -75,8 +76,6 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         TextView tvUserId;
         @BindView(R.id.et_username)
         EditText etUsername;
-        @BindView(R.id.gv_fingers)
-        GridView gvFingers;
         @BindView(R.id.btn_modify)
         Button btnModify;
         @BindView(R.id.btn_delete)
@@ -87,6 +86,14 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         Button btnCancel;
         @BindView(R.id.tv_finger_count)
         TextView tvFingerCount;
+        @BindView(R.id.gl_fingers)
+        GridLayout glFinger;
+
+        @BindColor(R.color.blue_band_dark3)
+        int colorBlueDark3;
+
+        @BindColor(R.color.dark)
+        int colorDark;
 
         private UserManageListener listener;
 
@@ -105,6 +112,11 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
                 btnDelete.setVisibility(View.GONE);
                 btnConfirm.setVisibility(View.VISIBLE);
                 btnCancel.setVisibility(View.VISIBLE);
+                for (int i=0; i<glFinger.getChildCount(); i++) {
+                    Button btnFinger = (Button) glFinger.getChildAt(i);
+                    btnFinger.setClickable(true);
+                    btnFinger.setTextColor(colorDark);
+                }
             }
         }
 
@@ -121,6 +133,11 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
                 btnDelete.setVisibility(View.VISIBLE);
                 btnConfirm.setVisibility(View.GONE);
                 btnCancel.setVisibility(View.GONE);
+                for (int i=0; i<glFinger.getChildCount(); i++) {
+                    Button btnFinger = (Button) glFinger.getChildAt(i);
+                    btnFinger.setClickable(false);
+                    btnFinger.setTextColor(colorBlueDark3);
+                }
             }
         }
 
@@ -132,6 +149,11 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
                 btnDelete.setVisibility(View.VISIBLE);
                 btnConfirm.setVisibility(View.GONE);
                 btnCancel.setVisibility(View.GONE);
+                for (int i=0; i<glFinger.getChildCount(); i++) {
+                    Button btnFinger = (Button) glFinger.getChildAt(i);
+                    btnFinger.setClickable(false);
+                    btnFinger.setTextColor(colorBlueDark3);
+                }
             }
         }
 

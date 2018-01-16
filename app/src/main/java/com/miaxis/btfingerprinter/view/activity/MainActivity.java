@@ -114,6 +114,7 @@ public class MainActivity extends BaseActivity {
                 public void onScanComplete(ScanResult[] results) {
                     if (results == null || results.length == 0) {
                         EventBus.getDefault().post(new ToastEvent("No Bluetooth Device"));
+                        startActivity(new Intent(MainActivity.this, PrintActivity.class));
                     }
                     tvSearch.setText(R.string.search);
                     tvSearch.setClickable(true);

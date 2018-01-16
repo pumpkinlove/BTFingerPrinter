@@ -11,4 +11,7 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="register">Register</string>
+    <string name="verify">Verify</string>
+    <string name="user_manage">User Manage</string>
 </resources>

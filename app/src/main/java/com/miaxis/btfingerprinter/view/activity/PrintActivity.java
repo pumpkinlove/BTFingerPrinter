@@ -13,7 +13,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -77,7 +76,6 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
 
     private BleManager bleManager;
     private int curOrderCode;
-    private Menu menu;
     ScanResult result;
 
     private UserListFragment userListFragment;
@@ -89,10 +87,11 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
     protected void onCreate(Bundle savedInstanceState) {
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN | WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_card_info);
+        setContentView(R.layout.activity_print);
         ButterKnife.bind(this);
         initData();
         initView();
+
     }
 
     @Override
@@ -132,8 +131,6 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_card_info, menu);
-
-        this.menu = menu;
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -153,6 +150,8 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
 
         if (userListFragment.isVisible()) {
             getFragmentManager().beginTransaction().remove(userListFragment).commit();
+            flMain.setVisibility(View.GONE);
+            llButtons.setVisibility(View.VISIBLE);
         } else {
             super.onBackPressed();
         }
@@ -575,7 +574,7 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
 
     private void printTest(String username) {
 
-        addPrintCache("    Welcome To Miaxis   ");
+        addPrintCache("    Welcome To Tatvik   ");
         addPrintCache("........................");
         addPrintCache("Tel:47515951Fax:12342234");
         addPrintCache("Shopping                ");
@@ -613,6 +612,8 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
 
     @OnClick(R.id.btn_user_manage)
     void onUserManage() {
+        llButtons.setVisibility(View.GONE);
+        flMain.setVisibility(View.VISIBLE);
         getFragmentManager().beginTransaction().replace(R.id.fl_main, userListFragment).commit();
     }
 

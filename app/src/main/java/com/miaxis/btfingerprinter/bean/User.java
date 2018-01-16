@@ -13,7 +13,6 @@ public class User {
     @Id(autoincrement = true)
     private Long id;
     private String name;
-    private byte[] finger0;
     private byte[] finger1;
     private byte[] finger2;
     private byte[] finger3;
@@ -23,13 +22,14 @@ public class User {
     private byte[] finger7;
     private byte[] finger8;
     private byte[] finger9;
-    @Generated(hash = 1048334036)
-    public User(Long id, String name, byte[] finger0, byte[] finger1,
-            byte[] finger2, byte[] finger3, byte[] finger4, byte[] finger5,
-            byte[] finger6, byte[] finger7, byte[] finger8, byte[] finger9) {
+    private byte[] finger10;
+
+    @Generated(hash = 588093980)
+    public User(Long id, String name, byte[] finger1, byte[] finger2,
+            byte[] finger3, byte[] finger4, byte[] finger5, byte[] finger6,
+            byte[] finger7, byte[] finger8, byte[] finger9, byte[] finger10) {
         this.id = id;
         this.name = name;
-        this.finger0 = finger0;
         this.finger1 = finger1;
         this.finger2 = finger2;
         this.finger3 = finger3;
@@ -39,88 +39,15 @@ public class User {
         this.finger7 = finger7;
         this.finger8 = finger8;
         this.finger9 = finger9;
+        this.finger10 = finger10;
     }
+
     @Generated(hash = 586692638)
     public User() {
-    }
-    public Long getId() {
-        return this.id;
-    }
-    public void setId(Long id) {
-        this.id = id;
-    }
-    public String getName() {
-        return this.name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
-    public byte[] getFinger0() {
-        return this.finger0;
-    }
-    public void setFinger0(byte[] finger0) {
-        this.finger0 = finger0;
-    }
-    public byte[] getFinger1() {
-        return this.finger1;
-    }
-    public void setFinger1(byte[] finger1) {
-        this.finger1 = finger1;
-    }
-    public byte[] getFinger2() {
-        return this.finger2;
-    }
-    public void setFinger2(byte[] finger2) {
-        this.finger2 = finger2;
-    }
-    public byte[] getFinger3() {
-        return this.finger3;
-    }
-    public void setFinger3(byte[] finger3) {
-        this.finger3 = finger3;
-    }
-    public byte[] getFinger4() {
-        return this.finger4;
-    }
-    public void setFinger4(byte[] finger4) {
-        this.finger4 = finger4;
-    }
-    public byte[] getFinger5() {
-        return this.finger5;
-    }
-    public void setFinger5(byte[] finger5) {
-        this.finger5 = finger5;
-    }
-    public byte[] getFinger6() {
-        return this.finger6;
-    }
-    public void setFinger6(byte[] finger6) {
-        this.finger6 = finger6;
-    }
-    public byte[] getFinger7() {
-        return this.finger7;
-    }
-    public void setFinger7(byte[] finger7) {
-        this.finger7 = finger7;
-    }
-    public byte[] getFinger8() {
-        return this.finger8;
-    }
-    public void setFinger8(byte[] finger8) {
-        this.finger8 = finger8;
-    }
-    public byte[] getFinger9() {
-        return this.finger9;
-    }
-    public void setFinger9(byte[] finger9) {
-        this.finger9 = finger9;
     }
 
     public int getFingerCount() {
         int count = 0;
-        if (finger0 != null && finger0.length > 0) {
-            count ++;
-        }
 
         if (finger1 != null && finger1.length > 0) {
             count ++;
@@ -157,7 +84,134 @@ public class User {
         if (finger9 != null && finger9.length > 0) {
             count ++;
         }
+
+        if (finger10 != null && finger10.length > 0) {
+            count ++;
+        }
         return count;
+    }
+
+    public byte[] getFingerById(int id) {
+        switch (id) {
+            case 1:
+                return finger1;
+            case 2:
+                return finger2;
+            case 3:
+                return finger3;
+            case 4:
+                return finger4;
+            case 5:
+                return finger5;
+            case 6:
+                return finger6;
+            case 7:
+                return finger7;
+            case 8:
+                return finger8;
+            case 9:
+                return finger9;
+            case 0:
+                return finger10;
+            default:
+                return null;
+        }
+    }
+
+    public Long getId() {
+        return this.id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public byte[] getFinger1() {
+        return this.finger1;
+    }
+
+    public void setFinger1(byte[] finger1) {
+        this.finger1 = finger1;
+    }
+
+    public byte[] getFinger2() {
+        return this.finger2;
+    }
+
+    public void setFinger2(byte[] finger2) {
+        this.finger2 = finger2;
+    }
+
+    public byte[] getFinger3() {
+        return this.finger3;
+    }
+
+    public void setFinger3(byte[] finger3) {
+        this.finger3 = finger3;
+    }
+
+    public byte[] getFinger4() {
+        return this.finger4;
+    }
+
+    public void setFinger4(byte[] finger4) {
+        this.finger4 = finger4;
+    }
+
+    public byte[] getFinger5() {
+        return this.finger5;
+    }
+
+    public void setFinger5(byte[] finger5) {
+        this.finger5 = finger5;
+    }
+
+    public byte[] getFinger6() {
+        return this.finger6;
+    }
+
+    public void setFinger6(byte[] finger6) {
+        this.finger6 = finger6;
+    }
+
+    public byte[] getFinger7() {
+        return this.finger7;
+    }
+
+    public void setFinger7(byte[] finger7) {
+        this.finger7 = finger7;
+    }
+
+    public byte[] getFinger8() {
+        return this.finger8;
+    }
+
+    public void setFinger8(byte[] finger8) {
+        this.finger8 = finger8;
+    }
+
+    public byte[] getFinger9() {
+        return this.finger9;
+    }
+
+    public void setFinger9(byte[] finger9) {
+        this.finger9 = finger9;
+    }
+
+    public byte[] getFinger10() {
+        return this.finger10;
+    }
+
+    public void setFinger10(byte[] finger10) {
+        this.finger10 = finger10;
     }
 
 }
