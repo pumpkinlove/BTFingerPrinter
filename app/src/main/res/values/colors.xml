@@ -25,4 +25,7 @@
     <color name="red">#f00</color>
     <color name="orange">#ffa453</color>
     <color name="orange_dark">#ff8d28</color>
+
+    <color name="light_red">#da6464</color>
+    <color name="light_red2">#ab4d4d</color>
 </resources>

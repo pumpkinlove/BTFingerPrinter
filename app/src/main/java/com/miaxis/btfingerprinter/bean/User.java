@@ -11,7 +11,7 @@ import org.greenrobot.greendao.annotation.Generated;
 @Entity
 public class User {
     @Id(autoincrement = true)
-    private long id;
+    private Long id;
     private String name;
     private byte[] finger0;
     private byte[] finger1;
@@ -23,8 +23,8 @@ public class User {
     private byte[] finger7;
     private byte[] finger8;
     private byte[] finger9;
-    @Generated(hash = 1104371995)
-    public User(long id, String name, byte[] finger0, byte[] finger1,
+    @Generated(hash = 1048334036)
+    public User(Long id, String name, byte[] finger0, byte[] finger1,
             byte[] finger2, byte[] finger3, byte[] finger4, byte[] finger5,
             byte[] finger6, byte[] finger7, byte[] finger8, byte[] finger9) {
         this.id = id;
@@ -43,10 +43,10 @@ public class User {
     @Generated(hash = 586692638)
     public User() {
     }
-    public long getId() {
+    public Long getId() {
         return this.id;
     }
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
     public String getName() {
@@ -114,6 +114,50 @@ public class User {
     }
     public void setFinger9(byte[] finger9) {
         this.finger9 = finger9;
+    }
+
+    public int getFingerCount() {
+        int count = 0;
+        if (finger0 != null && finger0.length > 0) {
+            count ++;
+        }
+
+        if (finger1 != null && finger1.length > 0) {
+            count ++;
+        }
+
+        if (finger2 != null && finger2.length > 0) {
+            count ++;
+        }
+
+        if (finger3 != null && finger3.length > 0) {
+            count ++;
+        }
+
+        if (finger4 != null && finger4.length > 0) {
+            count ++;
+        }
+
+        if (finger5 != null && finger5.length > 0) {
+            count ++;
+        }
+
+        if (finger6 != null && finger6.length > 0) {
+            count ++;
+        }
+
+        if (finger7 != null && finger7.length > 0) {
+            count ++;
+        }
+
+        if (finger8 != null && finger8.length > 0) {
+            count ++;
+        }
+
+        if (finger9 != null && finger9.length > 0) {
+            count ++;
+        }
+        return count;
     }
 
 }

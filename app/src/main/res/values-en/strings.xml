@@ -1,7 +1,0 @@
-<resources>
-    <string name="app_name">BtFingerPrinter</string>
-    <string name="MainActivity_title">BtFingerPrinter</string>
-    <string name="CardInfoActivity_title">BtFingerPrinter</string>
-    <string name="search">Search</string>
-    <string name="searching">Searching…</string>
-</resources>

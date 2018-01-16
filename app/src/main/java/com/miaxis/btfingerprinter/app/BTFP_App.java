@@ -13,10 +13,6 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-/**
- * Created by xu.nan on 2017/8/24.
- */
-
 public class BTFP_App extends Application {
 
     private DaoMaster mDaoMaster;
@@ -33,8 +29,8 @@ public class BTFP_App extends Application {
     public void onCreate() {
         super.onCreate();
         EventBus.getDefault().register(this);
-//        app = this;
-//        initDbHelp();
+        app = this;
+        initDbHelp();
     }
 
     private void initDbHelp() {

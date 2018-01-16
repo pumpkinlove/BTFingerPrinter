@@ -2,11 +2,11 @@ package com.miaxis.btfingerprinter.view.activity;
 
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -24,7 +25,8 @@ import com.clj.fastble.conn.BleGattCallback;
 import com.clj.fastble.data.ScanResult;
 import com.clj.fastble.exception.BleException;
 import com.miaxis.btfingerprinter.R;
-import com.miaxis.btfingerprinter.event.AnalysisDoneEvent;
+import com.miaxis.btfingerprinter.app.BTFP_App;
+import com.miaxis.btfingerprinter.bean.User;
 import com.miaxis.btfingerprinter.event.BtnEnableEvent;
 import com.miaxis.btfingerprinter.event.ClearEvent;
 import com.miaxis.btfingerprinter.event.ScrollPaperEvent;
@@ -34,9 +36,9 @@ import com.miaxis.btfingerprinter.event.ShowMsgEvent;
 import com.miaxis.btfingerprinter.utils.BluetoothUUID;
 import com.miaxis.btfingerprinter.utils.CodeUtil;
 import com.miaxis.btfingerprinter.utils.DateUtil;
-import com.miaxis.btfingerprinter.utils.LogUtil;
 import com.miaxis.btfingerprinter.utils.OrderCode;
-import com.miaxis.btfingerprinter.view.custom.FingerIdDialog;
+import com.miaxis.btfingerprinter.view.custom.RegisterDialog;
+import com.miaxis.btfingerprinter.view.fragment.UserListFragment;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -47,7 +49,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class PrintActivity extends BaseActivity {
+public class PrintActivity extends BaseActivity implements UserListFragment.OnFragmentInteractionListener {
 
     private static final String TAG = "PrintActivity";
     private static final byte PROTOCOL_HEAD = 0x02;
@@ -64,27 +66,21 @@ public class PrintActivity extends BaseActivity {
     TextView tvMessage;
     @BindView(R.id.sv_message)
     ScrollView svMessage;
-    @BindView(R.id.et_print)
-    EditText etPrint;
-    @BindView(R.id.btn_print)
-    Button btnPrint;
-    @BindView(R.id.ll_diy_order)
-    LinearLayout llDiyOrder;
     @BindView(R.id.btn_reg_finger)
     Button btnRegFinger;
     @BindView(R.id.btn_search_finger)
     Button btnSearchFinger;
-    @BindView(R.id.btn_delete_finger)
-    Button btnDeleteFinger;
-    @BindView(R.id.btn_clear_finger)
-    Button btnClearFinger;
     @BindView(R.id.ll_buttons)
     LinearLayout llButtons;
+    @BindView(R.id.fl_main)
+    FrameLayout flMain;
 
     private BleManager bleManager;
     private int curOrderCode;
     private Menu menu;
     ScanResult result;
+
+    private UserListFragment userListFragment;
 
     private byte[] cacheData = new byte[0];
     private String[] cachePrintContent = new String[0];
@@ -109,6 +105,7 @@ public class PrintActivity extends BaseActivity {
 
     @Override
     protected void initData() {
+        userListFragment = new UserListFragment();
         EventBus.getDefault().register(this);
         bleManager = new BleManager(this);
         result = getIntent().getParcelableExtra("ScanResult");
@@ -121,9 +118,9 @@ public class PrintActivity extends BaseActivity {
                 e.printStackTrace();
             }
             bleManager.connectDevice(result, true, callback);
-            showMsg("开始连接蓝牙...", darkColor);
+            showMsg("Connecting...", darkColor);
         } else {
-            showMsg("设备为空", redColor);
+            showMsg("No Device", redColor);
         }
     }
 
@@ -153,33 +150,39 @@ public class PrintActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+
+        if (userListFragment.isVisible()) {
+            getFragmentManager().beginTransaction().remove(userListFragment).commit();
+        } else {
+            super.onBackPressed();
+        }
+
     }
 
     private BleGattCallback callback = new BleGattCallback() {
         @Override
         public void onConnectError(BleException exception) {
-            showMsg("连接错误", redColor);
+            showMsg("Connect Error", redColor);
         }
 
         @Override
         public void onConnectSuccess(BluetoothGatt gatt, int status) {
-            showMsg("连接成功", greenColor);
+            showMsg("Connected", greenColor);
         }
 
         @Override
         public void onDisConnected(BluetoothGatt gatt, int status, BleException exception) {
-            showMsg("连接断开", redColor);
+            showMsg("DisConnected", redColor);
         }
 
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
-            showMsg("连接状态改变" + status + " -> " + newState, darkColor);
+            showMsg("ConnectionStateChange " + status + " -> " + newState, darkColor);
         }
 
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-            showMsg("发现蓝牙服务", darkColor);
+            showMsg("BluetoothServicesDiscovered", darkColor);
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
@@ -284,33 +287,6 @@ public class PrintActivity extends BaseActivity {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onAnalysisDoneEvent(AnalysisDoneEvent e) {
-        try {
-            byte[] data;
-            switch (curOrderCode) {
-                case OrderCode.CMD_REG_FINGER:
-                    break;
-                case OrderCode.CMD_SEARCH_FINGER:
-                    break;
-                case OrderCode.CMD_DELETE_FINGER:
-                    break;
-                case OrderCode.CMD_CLEAR_FINGER:
-                    break;
-                case OrderCode.CMD_DIY_ORDER:
-                    break;
-                case OrderCode.CMD_PRINT:
-                    break;
-            }
-        } catch (Exception ex) {
-            showMsg("解析处理结果异常：Exception = " + ex.getMessage(), redColor);
-            showMsg("解析处理结果异常：ReMsg = " + e.getReMsg(), redColor);
-            LogUtil.writeLog("解析处理结果异常：Exception = " + ex.getMessage());
-            LogUtil.writeLog("解析处理结果异常： ReMsg = " + e.getReMsg());
-        }
-
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onShowMsgEvent(ShowMsgEvent e) {
         SpannableString ss = new SpannableString(e.getMessage() + "\r\n");
         if (e.getColor() != 0) {
@@ -319,7 +295,7 @@ public class PrintActivity extends BaseActivity {
         tvMessage.append(ss);
         svMessage.post(new Runnable() {
             public void run() {
-                svMessage.fullScroll(ScrollView.FOCUS_DOWN);      //滚动到底部
+                svMessage.fullScroll(ScrollView.FOCUS_DOWN);
             }
         });
     }
@@ -344,9 +320,9 @@ public class PrintActivity extends BaseActivity {
             @Override
             public void onInitiatedResult(boolean result) {
                 if (result) {
-                    showMsg("开启提醒成功", greenColor);
+                    showMsg("Notify Initialization Succeed", greenColor);
                 } else {
-                    showMsg("开启提醒失败", redColor);
+                    showMsg("Notify Initialization Failed", redColor);
                 }
             }
 
@@ -356,15 +332,14 @@ public class PrintActivity extends BaseActivity {
     private void sendOrder(int orderCode, byte[] orderCodeData, final String orderName) {
         curOrderCode = orderCode;
         orderCodeData = CodeUtil.splitReqBytes(orderCodeData);
-        Log.e("getfinger", CodeUtil.hex2str(orderCodeData));
         int dataLen = orderCodeData.length;
         if (dataLen <= 20) {
             writeData(orderCodeData, orderName);
         } else {
-            final int packNum = dataLen % 20 == 0 ? (dataLen / 20 ) : (dataLen / 20 + 1);
+            final int packNum = dataLen % 20 == 0 ? (dataLen / 20) : (dataLen / 20 + 1);
             int lastPackLen = dataLen % 20;
             final byte[][] packs = new byte[packNum][20];
-            for (int i=0; i<packNum; i++) {
+            for (int i = 0; i < packNum; i++) {
                 if (i == packNum - 1) {
                     packs[i] = new byte[lastPackLen];
                     System.arraycopy(orderCodeData, i * 20, packs[i], 0, lastPackLen);
@@ -375,7 +350,7 @@ public class PrintActivity extends BaseActivity {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    for (int i=0; i<packNum; i++) {
+                    for (int i = 0; i < packNum; i++) {
                         try {
                             Thread.sleep(150);
                             EventBus.getDefault().post(new SendPackEvent(i, packs[i]));
@@ -399,22 +374,20 @@ public class PrintActivity extends BaseActivity {
             @Override
             public void onSuccess(BluetoothGattCharacteristic characteristic) {
                 enableBtns(false);
-                if (!orderName.startsWith("打印") && !orderName.startsWith("滚纸")) {
-                    showMsg("开始" + orderName, darkColor);
+                if (!orderName.startsWith("打印") && !orderName.startsWith("Scroll Paper")) {
+                    showMsg("Start " + orderName, darkColor);
                 }
             }
 
             @Override
             public void onFailure(BleException exception) {
-                showMsg(orderName + "指令发送失败", redColor);
+                showMsg(orderName + "WriteData Failed", redColor);
             }
 
             @Override
             public void onInitiatedResult(boolean result) {
-                if (result) {
-//                    showMsg(orderName + "指令初始化成功", greenColor);
-                } else {
-                    showMsg(orderName + "指令初始化失败", redColor);
+                if (!result) {
+                    showMsg(orderName + "WriteData Initialization Failed", redColor);
                 }
             }
         });
@@ -422,15 +395,16 @@ public class PrintActivity extends BaseActivity {
 
     @OnClick(R.id.btn_reg_finger)
     void onRegFinger() {
-        final FingerIdDialog dialog = new FingerIdDialog();
+        final RegisterDialog dialog = new RegisterDialog();
         dialog.setConfirmListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                registerFinger(dialog.getFingerId());
-                hideSoftInput(v);
+                User user = dialog.getUser();
+                BTFP_App.getInstance().getDaoSession().getUserDao().insert(user);
                 dialog.dismiss();
             }
         });
+
         dialog.setCancelListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -438,118 +412,38 @@ public class PrintActivity extends BaseActivity {
                 dialog.dismiss();
             }
         });
+
+        dialog.setRegFingerListener(new RegisterDialog.RegFingerListener() {
+            @Override
+            public void onRegFinger(int fingerId) {
+                getFinger();
+            }
+        });
+
         dialog.setCancelable(false);
         dialog.show(getFragmentManager(), "Reg");
     }
 
     @OnClick(R.id.btn_search_finger)
     void onSearchFinger() {
-        searchFinger();
     }
 
-    @OnClick(R.id.btn_delete_finger)
-    void onDeleteFinger() {
-        final FingerIdDialog dialog = new FingerIdDialog();
-        dialog.setConfirmListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                delteFinger(dialog.getFingerId());
-                hideSoftInput(v);
-                dialog.dismiss();
-            }
-        });
-        dialog.setCancelListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                hideSoftInput(v);
-                dialog.dismiss();
-            }
-        });
-        dialog.setCancelable(false);
-        dialog.show(getFragmentManager(), "Reg");
-    }
-
-    @OnClick(R.id.btn_clear_finger)
-    void onClearFinger() {
-        clearFinger();
-    }
-
-    @OnClick(R.id.btn_print)
-    void onPrintOrder() {
+    private void getFinger() {
         byte[] reqBytes = new byte[13];
         reqBytes[0] = PROTOCOL_HEAD;
-        reqBytes[1] = (byte)0x00;
-        reqBytes[2] = (byte)0x08;
-        reqBytes[3] = (byte)0x98;
-        reqBytes[4] = (byte)0x00;
-        reqBytes[5] = (byte)0x00;
-        reqBytes[6] = (byte)0x00;
-        reqBytes[7] = (byte)0x00;
-        reqBytes[8] = (byte)0x00;
+        reqBytes[1] = (byte) 0x00;
+        reqBytes[2] = (byte) 0x08;
+        reqBytes[3] = (byte) 0x98;
+        reqBytes[4] = (byte) 0x00;
+        reqBytes[5] = (byte) 0x00;
+        reqBytes[6] = (byte) 0x00;
+        reqBytes[7] = (byte) 0x00;
+        reqBytes[8] = (byte) 0x00;
         reqBytes[9] = (byte) 0x27;
         reqBytes[10] = (byte) 0x10;
         reqBytes[11] = CodeUtil.getXorCheckCode(reqBytes);
         reqBytes[12] = PROTOCOL_END;
         sendOrder(OrderCode.CMD_GET_FINGER, reqBytes, "采集指纹");
-
-    }
-
-    private void registerFinger(int fingerId) {
-        byte[] reqBytes = new byte[10];
-        reqBytes[0] = PROTOCOL_HEAD;
-        reqBytes[1] = 0x00;
-        reqBytes[2] = 0x05;
-        reqBytes[3] = 0x68;
-        reqBytes[4] = 0x00;
-        reqBytes[5] = 0x00;
-        reqBytes[6] = 0x00;
-        reqBytes[7] = (byte) fingerId;
-        reqBytes[8] = CodeUtil.getXorCheckCode(reqBytes);
-        reqBytes[9] = PROTOCOL_END;
-        sendOrder(OrderCode.CMD_REG_FINGER, reqBytes, "注册指纹 id = " + fingerId + " ");
-    }
-
-    private void searchFinger() {
-        byte[] reqBytes = new byte[9];
-        reqBytes[0] = PROTOCOL_HEAD;
-        reqBytes[1] = (byte)0x00;
-        reqBytes[2] = (byte)0x04;
-        reqBytes[3] = (byte)0x69;
-        reqBytes[4] = (byte)0x00;
-        reqBytes[5] = (byte)0x00;
-        reqBytes[6] = (byte)0x00;
-        reqBytes[7] = CodeUtil.getXorCheckCode(reqBytes);
-        reqBytes[8] = PROTOCOL_END;
-        sendOrder(OrderCode.CMD_SEARCH_FINGER, reqBytes, "搜索指纹");
-    }
-
-    private void delteFinger(int fingerId) {
-        byte[] reqBytes = new byte[10];
-        reqBytes[0] = PROTOCOL_HEAD;
-        reqBytes[1] = 0x00;
-        reqBytes[2] = 0x05;
-        reqBytes[3] = 0x6A;
-        reqBytes[4] = 0x00;
-        reqBytes[5] = 0x00;
-        reqBytes[6] = 0x00;
-        reqBytes[7] = (byte) fingerId;
-        reqBytes[8] = CodeUtil.getXorCheckCode(reqBytes);
-        reqBytes[9] = PROTOCOL_END;
-        sendOrder(OrderCode.CMD_DELETE_FINGER, reqBytes, "Delete Finger id = " + fingerId + " ");
-    }
-
-    private void clearFinger() {
-        byte[] reqBytes = new byte[9];
-        reqBytes[0] = PROTOCOL_HEAD;
-        reqBytes[1] = 0x00;
-        reqBytes[2] = 0x04;
-        reqBytes[3] = 0x6B;
-        reqBytes[4] = 0x00;
-        reqBytes[5] = 0x00;
-        reqBytes[6] = 0x00;
-        reqBytes[7] = CodeUtil.getXorCheckCode(reqBytes);
-        reqBytes[8] = PROTOCOL_END;
-        sendOrder(OrderCode.CMD_CLEAR_FINGER, reqBytes, "清空指纹");
     }
 
     private void print(String content, int dataLen) {
@@ -561,10 +455,10 @@ public class PrintActivity extends BaseActivity {
         reqBytes[4] = 0x00;
         reqBytes[5] = 0x00;
         reqBytes[6] = 0x00;
-        for (int i = 0; i < content.length(); i ++) {
+        for (int i = 0; i < content.length(); i++) {
             reqBytes[7 + i] = (byte) content.charAt(i);
         }
-        for (int i = 7 + content.length(); i < 7 + dataLen; i ++) {
+        for (int i = 7 + content.length(); i < 7 + dataLen; i++) {
             reqBytes[i] = 0x20;
         }
         reqBytes[7 + dataLen] = CodeUtil.getXorCheckCode(reqBytes);
@@ -577,8 +471,8 @@ public class PrintActivity extends BaseActivity {
             return;
         }
         boolean hasHead = false;
-        for (int i=0; i<btData.length; i++) {
-            if (btData[i] == PROTOCOL_HEAD ) {
+        for (int i = 0; i < btData.length; i++) {
+            if (btData[i] == PROTOCOL_HEAD) {
                 byte[] tempCacheData = new byte[btData.length - i];
                 System.arraycopy(btData, i, tempCacheData, 0, tempCacheData.length);
                 btData = tempCacheData;
@@ -587,7 +481,7 @@ public class PrintActivity extends BaseActivity {
             }
         }
         boolean hasEnd = false;
-        for (int i=0; i<btData.length; i++) {
+        for (int i = 0; i < btData.length; i++) {
             if (btData[i] == PROTOCOL_END) {
                 byte[] tempCacheData = new byte[i + 1];
                 System.arraycopy(btData, 0, tempCacheData, 0, tempCacheData.length);
@@ -653,9 +547,6 @@ public class PrintActivity extends BaseActivity {
     public void onBtnEnableEvent(BtnEnableEvent e) {
         btnRegFinger.setEnabled(e.isEnable());
         btnSearchFinger.setEnabled(e.isEnable());
-        btnDeleteFinger.setEnabled(e.isEnable());
-        btnClearFinger.setEnabled(e.isEnable());
-        btnPrint.setEnabled(e.isEnable());
     }
 
     private void enableBtns(boolean enable) {
@@ -682,18 +573,14 @@ public class PrintActivity extends BaseActivity {
         cachePrintContent = temp;
     }
 
-    private void printTest(String id) {
+    private void printTest(String username) {
 
-        if (id != null && id.length() > 12) {
-            id = id.substring(0, 12);
-        }
         addPrintCache("    Welcome To Miaxis   ");
-        addPrintCache("FingerId = " + id);
         addPrintCache("........................");
         addPrintCache("Tel:47515951Fax:12342234");
         addPrintCache("Shopping                ");
         addPrintCache("Date:" + DateUtil.getCurDateTime2());
-        addPrintCache("Customer: ZhangSan      ");
+        addPrintCache("Customer: " + username);
         addPrintCache("Item    Qty Price Amount");
         addPrintCache("........................");
         addPrintCache("381853  2   4     8     ");
@@ -716,12 +603,25 @@ public class PrintActivity extends BaseActivity {
         reqBytes[7] = (byte) num;
         reqBytes[8] = CodeUtil.getXorCheckCode(reqBytes);
         reqBytes[9] = PROTOCOL_END;
-        sendOrder(OrderCode.CMD_SCROLL_PAPER, reqBytes, "滚纸 " + num + " 行");
+        sendOrder(OrderCode.CMD_SCROLL_PAPER, reqBytes, "Scroll Paper " + num + " 行");
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onScrollPaper(ScrollPaperEvent e) {
         scrollPaper(e.getNum());
     }
+
+    @OnClick(R.id.btn_user_manage)
+    void onUserManage() {
+        getFragmentManager().beginTransaction().replace(R.id.fl_main, userListFragment).commit();
+    }
+
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
+    }
+
+
 
 }
