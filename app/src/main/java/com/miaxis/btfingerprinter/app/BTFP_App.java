@@ -52,6 +52,7 @@ public class BTFP_App extends Application {
     }
 
     public DaoSession getDaoSession() {
+        mDaoSession.clear();
         return mDaoSession;
     }
     public SQLiteDatabase getDb() {

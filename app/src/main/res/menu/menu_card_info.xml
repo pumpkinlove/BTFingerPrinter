@@ -7,7 +7,7 @@
         android:id="@+id/action_clear"
         app:showAsAction="always"
         android:icon="@mipmap/clear_info"
-        android:title="清空信息"
+        android:title="Clear"
         tools:ignore="AppCompatResource" />
 
 </menu>

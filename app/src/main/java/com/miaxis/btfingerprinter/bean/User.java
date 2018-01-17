@@ -3,6 +3,7 @@ package com.miaxis.btfingerprinter.bean;
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Generated;
+import org.greenrobot.greendao.annotation.Transient;
 
 /**
  * Created by xu.nan on 2018/1/12.
@@ -23,6 +24,8 @@ public class User {
     private byte[] finger8;
     private byte[] finger9;
     private byte[] finger10;
+    @Transient
+    private boolean isModing;
 
     @Generated(hash = 588093980)
     public User(Long id, String name, byte[] finger1, byte[] finger2,
@@ -91,8 +94,8 @@ public class User {
         return count;
     }
 
-    public byte[] getFingerById(int id) {
-        switch (id) {
+    public byte[] getFingerById(int fingerId) {
+        switch (fingerId) {
             case 1:
                 return finger1;
             case 2:
@@ -115,6 +118,41 @@ public class User {
                 return finger10;
             default:
                 return null;
+        }
+    }
+
+    public void setFingerById(byte[] fingerData, int fingerId) {
+        switch (fingerId) {
+            case 1:
+                finger1 = fingerData;
+                break;
+            case 2:
+                finger2 = fingerData;
+                break;
+            case 3:
+                finger3 = fingerData;
+                break;
+            case 4:
+                finger4 = fingerData;
+                break;
+            case 5:
+                finger5 = fingerData;
+                break;
+            case 6:
+                finger6 = fingerData;
+                break;
+            case 7:
+                finger7 = fingerData;
+                break;
+            case 8:
+                finger8 = fingerData;
+                break;
+            case 9:
+                finger9 = fingerData;
+                break;
+            case 0:
+                finger10 = fingerData;
+                break;
         }
     }
 
@@ -214,4 +252,11 @@ public class User {
         this.finger10 = finger10;
     }
 
+    public boolean isModing() {
+        return isModing;
+    }
+
+    public void setModing(boolean moding) {
+        isModing = moding;
+    }
 }

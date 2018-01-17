@@ -72,7 +72,10 @@ public class RegisterDialog extends DialogFragment {
         return view;
     }
 
+
+
     private void initView() {
+        etUsername.setText(null);
         int count = glFingers.getChildCount();
         for (int i=0; i<count; i++) {
             Button btn = (Button) glFingers.getChildAt(i);
@@ -83,7 +86,7 @@ public class RegisterDialog extends DialogFragment {
                     if (regFingerListener == null) {
                         return;
                     }
-                    regFingerListener.onRegFinger(finalI);
+                    regFingerListener.onRegFinger(finalI + 1); //fingerId 1-10
                 }
             });
         }
@@ -107,15 +110,21 @@ public class RegisterDialog extends DialogFragment {
         regFingerListener = listener;
     }
 
-    public User getUser() {
-        user = new User();
-        user.setName(etUsername.getText().toString());
+    public String getUsername() {
+        return etUsername.getText().toString();
+    }
 
-        return user;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public interface RegFingerListener {
         void onRegFinger(int fingerId);
+    }
+
+    public void setFingerColor(int fingerId) {
+        Button btnFinger = (Button) glFingers.getChildAt(fingerId - 1);
+        btnFinger.setTextColor(getActivity().getResources().getColor(R.color.green_dark));
     }
 
 }

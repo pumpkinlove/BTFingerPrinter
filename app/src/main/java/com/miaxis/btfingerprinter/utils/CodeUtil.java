@@ -313,6 +313,12 @@ public class CodeUtil {
         return temp;
     }
 
+    public static byte[] getData(byte[] mergeData) {
+        byte[] temp = new byte[mergeData.length - 7];
+        System.arraycopy(mergeData, 5, temp, 0, temp.length);
+        return temp;
+    }
+
     private static byte[] splitByte(byte bByte) {
         short tempShort = (short)bByte;
         if (tempShort < 0) {

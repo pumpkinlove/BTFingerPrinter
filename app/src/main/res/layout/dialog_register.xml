@@ -43,63 +43,43 @@
         android:layout_height="wrap_content">
 
         <Button
-            android:textColor="@color/dark"
-            android:background="@drawable/white_btn_bg"
-            android:layout_columnWeight="1"
+            style="@style/button_finger"
             android:text="Finger 1"/>
 
         <Button
-            android:textColor="@color/dark"
-            android:background="@drawable/white_btn_bg"
-            android:layout_columnWeight="1"
+            style="@style/button_finger"
             android:text="Finger 2"/>
 
         <Button
-            android:textColor="@color/dark"
-            android:background="@drawable/white_btn_bg"
-            android:layout_columnWeight="1"
+            style="@style/button_finger"
             android:text="Finger 3"/>
 
         <Button
-            android:textColor="@color/dark"
-            android:background="@drawable/white_btn_bg"
-            android:layout_columnWeight="1"
+            style="@style/button_finger"
             android:text="Finger 4"/>
 
         <Button
-            android:textColor="@color/dark"
-            android:background="@drawable/white_btn_bg"
-            android:layout_columnWeight="1"
+            style="@style/button_finger"
             android:text="Finger 5"/>
 
         <Button
-            android:textColor="@color/dark"
-            android:background="@drawable/white_btn_bg"
-            android:layout_columnWeight="1"
+            style="@style/button_finger"
             android:text="Finger 6"/>
 
         <Button
-            android:textColor="@color/dark"
-            android:background="@drawable/white_btn_bg"
-            android:layout_columnWeight="1"
+            style="@style/button_finger"
             android:text="Finger 7"/>
 
         <Button
-            android:textColor="@color/dark"
-            android:background="@drawable/white_btn_bg"
-            android:layout_columnWeight="1"
+            style="@style/button_finger"
             android:text="Finger 8"/>
 
         <Button
-            android:textColor="@color/dark"
-            android:background="@drawable/white_btn_bg"
-            android:layout_columnWeight="1"
+            style="@style/button_finger"
             android:text="Finger 9"/>
 
         <Button
-            android:textColor="@color/dark"
-            android:background="@drawable/white_btn_bg"
-            android:layout_columnWeight="1"
+            style="@style/button_finger"
             android:text="Finger 10"/>
 
     </GridLayout>

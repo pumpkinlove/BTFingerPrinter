@@ -5,7 +5,7 @@
         android:id="@+id/action_search_device"
         android:icon="@mipmap/search_black"
         android:showAsAction="always"
-        android:title="搜索"
+        android:title="@string/search"
         tools:ignore="AppCompatResource" />
 
 </menu>

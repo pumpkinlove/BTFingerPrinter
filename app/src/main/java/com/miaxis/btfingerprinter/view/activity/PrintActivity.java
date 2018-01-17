@@ -6,7 +6,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -28,6 +30,7 @@ import com.miaxis.btfingerprinter.app.BTFP_App;
 import com.miaxis.btfingerprinter.bean.User;
 import com.miaxis.btfingerprinter.event.BtnEnableEvent;
 import com.miaxis.btfingerprinter.event.ClearEvent;
+import com.miaxis.btfingerprinter.event.GetFingerEvent;
 import com.miaxis.btfingerprinter.event.ScrollPaperEvent;
 import com.miaxis.btfingerprinter.event.SendPackEvent;
 import com.miaxis.btfingerprinter.event.ServiceDiscoveredEvent;
@@ -42,11 +45,22 @@ import com.miaxis.btfingerprinter.view.fragment.UserListFragment;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.zz.jni.zzFingerAlg;
+
+import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 import butterknife.BindColor;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 
 public class PrintActivity extends BaseActivity implements UserListFragment.OnFragmentInteractionListener {
 
@@ -83,6 +97,12 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
     private byte[] cacheData = new byte[0];
     private String[] cachePrintContent = new String[0];
 
+    private User mUser;
+    private int mFingerId;
+    private final RegisterDialog dialog = new RegisterDialog();
+
+    private zzFingerAlg zzFingerAlg;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN | WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
@@ -104,6 +124,7 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
 
     @Override
     protected void initData() {
+        zzFingerAlg = new zzFingerAlg();
         userListFragment = new UserListFragment();
         EventBus.getDefault().register(this);
         bleManager = new BleManager(this);
@@ -140,7 +161,6 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
             case R.id.action_clear:
                 onClearEvent(new ClearEvent(true));
                 break;
-
         }
         return true;
     }
@@ -152,6 +172,7 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
             getFragmentManager().beginTransaction().remove(userListFragment).commit();
             flMain.setVisibility(View.GONE);
             llButtons.setVisibility(View.VISIBLE);
+            svMessage.setVisibility(View.VISIBLE);
         } else {
             super.onBackPressed();
         }
@@ -172,6 +193,7 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
         @Override
         public void onDisConnected(BluetoothGatt gatt, int status, BleException exception) {
             showMsg("DisConnected", redColor);
+            enableBtns(false);
         }
 
         @Override
@@ -212,67 +234,67 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
     private boolean handleReturnSw1(byte sw1, StringBuilder reMsgSb) {
         switch (sw1) {
             case 0x00:
-                reMsgSb.append("操作成功");
+                reMsgSb.append("Operation Succeeded");
                 return true;
             case 0x01:
-                reMsgSb.append("操作失败");
+                reMsgSb.append("Operation Failed");
                 return false;
             case 0x04:
-                reMsgSb.append("指纹数据库已满");
+                reMsgSb.append("Finger DataBase Full");
                 return false;
             case 0x05:
-                reMsgSb.append("无此用户");
+                reMsgSb.append("No user");
                 return false;
             case 0x07:
-                reMsgSb.append("用户已存在");
+                reMsgSb.append("User Exists");
                 return false;
             case 0x08:
-                reMsgSb.append("采集超时");
+                reMsgSb.append("Out of time");
                 return false;
             case 0x09:
-                reMsgSb.append("空闲");
+                reMsgSb.append("Free");
                 return false;
             case 0x0A:
-                reMsgSb.append("命令执行中");
+                reMsgSb.append("Orders executing");
                 return false;
             case 0x0B:
-                reMsgSb.append("有指纹按上");
+                reMsgSb.append("Has Finger");
                 return false;
             case 0x0C:
-                reMsgSb.append("无指纹按上");
+                reMsgSb.append("No Finger");
                 return false;
             case 0x0D:
-                reMsgSb.append("指纹认证通过");
+                reMsgSb.append("Finger Pass");
                 return true;
             case 0x0E:
-                reMsgSb.append("指纹认证失败");
+                reMsgSb.append("Finger Not Pass");
                 return false;
             case 0x0F:
-                reMsgSb.append("处于安全等级1");
+                reMsgSb.append("Security Level 1");
                 return false;
             case 0x10:
-                reMsgSb.append("处于安全等级2");
+                reMsgSb.append("Security Level 2");
                 return false;
             case 0x11:
-                reMsgSb.append("处于安全等级3");
+                reMsgSb.append("Security Level 3");
                 return false;
             case 0x12:
-                reMsgSb.append("处于安全等级4");
+                reMsgSb.append("Security Level 4");
                 return false;
             case 0x13:
-                reMsgSb.append("处于安全等级5");
+                reMsgSb.append("Security Level 5");
                 return false;
             case 0x60:
-                reMsgSb.append("无手指");
+                reMsgSb.append("No Finger");
                 return false;
             case 0x61:
-                reMsgSb.append("搜索失败");
+                reMsgSb.append("Search Fail");
                 return false;
             case 0x62:
-                reMsgSb.append("生成模板失败");
+                reMsgSb.append("Generate Plate Fail");
                 return false;
             case 0x63:
-                reMsgSb.append("生成特征失败");
+                reMsgSb.append("Generate Feature Fail");
                 return false;
         }
         return true;
@@ -306,14 +328,13 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
             @Override
             public void onSuccess(BluetoothGattCharacteristic characteristic) {
                 byte[] values = characteristic.getValue();
-                showMsg(CodeUtil.hex2str(values) + "", darkColor);
                 analysisData(values);
                 enableBtns(true);
             }
 
             @Override
             public void onFailure(BleException exception) {
-                showMsg("提醒失败", redColor);
+                showMsg("Bluetooth Notify failed", redColor);
             }
 
             @Override
@@ -323,6 +344,7 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
                 } else {
                     showMsg("Notify Initialization Failed", redColor);
                 }
+                enableBtns(result);
             }
 
         });
@@ -365,7 +387,7 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onSendPack(SendPackEvent pack) {
-        writeData(pack.getData(), "打印" + pack.getPackNo());
+        writeData(pack.getData(), "Print" + pack.getPackNo());
     }
 
     private void writeData(final byte[] orderCodeData, final String orderName) {
@@ -373,7 +395,7 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
             @Override
             public void onSuccess(BluetoothGattCharacteristic characteristic) {
                 enableBtns(false);
-                if (!orderName.startsWith("打印") && !orderName.startsWith("Scroll Paper")) {
+                if (!orderName.startsWith("Print") && !orderName.startsWith("Scroll Paper")) {
                     showMsg("Start " + orderName, darkColor);
                 }
             }
@@ -394,13 +416,16 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
 
     @OnClick(R.id.btn_reg_finger)
     void onRegFinger() {
-        final RegisterDialog dialog = new RegisterDialog();
+        mUser = new User();
         dialog.setConfirmListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                User user = dialog.getUser();
-                BTFP_App.getInstance().getDaoSession().getUserDao().insert(user);
-                dialog.dismiss();
+                String username = dialog.getUsername();
+                if (!TextUtils.isEmpty(username)) {
+                    mUser.setName(dialog.getUsername());
+                    BTFP_App.getInstance().getDaoSession().getUserDao().insert(mUser);
+                    dialog.dismiss();
+                }
             }
         });
 
@@ -415,7 +440,8 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
         dialog.setRegFingerListener(new RegisterDialog.RegFingerListener() {
             @Override
             public void onRegFinger(int fingerId) {
-                getFinger();
+                mFingerId = fingerId;
+                getFinger(OrderCode.CMD_GET_FINGER);
             }
         });
 
@@ -425,9 +451,10 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
 
     @OnClick(R.id.btn_search_finger)
     void onSearchFinger() {
+        getFinger(OrderCode.CMD_SEARCH_FINGER);
     }
 
-    private void getFinger() {
+    private void getFinger(int OrderCodeCmd) {
         byte[] reqBytes = new byte[13];
         reqBytes[0] = PROTOCOL_HEAD;
         reqBytes[1] = (byte) 0x00;
@@ -442,7 +469,7 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
         reqBytes[10] = (byte) 0x10;
         reqBytes[11] = CodeUtil.getXorCheckCode(reqBytes);
         reqBytes[12] = PROTOCOL_END;
-        sendOrder(OrderCode.CMD_GET_FINGER, reqBytes, "采集指纹");
+        sendOrder(OrderCodeCmd, reqBytes, "Get Finger");
     }
 
     private void print(String content, int dataLen) {
@@ -462,7 +489,7 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
         }
         reqBytes[7 + dataLen] = CodeUtil.getXorCheckCode(reqBytes);
         reqBytes[8 + dataLen] = PROTOCOL_END;
-        sendOrder(OrderCode.CMD_PRINT, reqBytes, "打印");
+        sendOrder(OrderCode.CMD_PRINT, reqBytes, "Print");
     }
 
     private void analysisData(byte[] btData) {
@@ -498,21 +525,17 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
 
         if (hasEnd) {
             StringBuilder reMsgSb = new StringBuilder();
-            showMsg("cacheDataLen = " + cacheData.length, darkColor);
-            showMsg("len = " + CodeUtil.hex2str(new byte[]{cacheData[1], cacheData[2], cacheData[3], cacheData[4]}), darkColor);
 
             byte[] mergeCacheData = CodeUtil.mergeRetBytes(cacheData);
             if (CodeUtil.getXorCheckCode(mergeCacheData) != mergeCacheData[mergeCacheData.length - 2]) {
                 showMsg("Check Code Error", redColor);
-//                cacheData = null;
-//                return;
+                cacheData = null;
+                return;
             }
             if (handleReturnSw1(mergeCacheData[3], reMsgSb)) {
                 switch (curOrderCode) {
                     case OrderCode.CMD_SEARCH_FINGER:
-                        reMsgSb.append(" FingerId = ").append(mergeCacheData[5]);
-                        showMsg(reMsgSb.toString(), greenColor);
-                        printTest(mergeCacheData[5] + "");
+                        verify(CodeUtil.getData(mergeCacheData));
                         break;
                     case OrderCode.CMD_PRINT:
                         printCache();
@@ -521,8 +544,11 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
 
                         break;
                     case OrderCode.CMD_GET_FINGER:
-                        showMsg("len = " + mergeCacheData.length, darkColor);
-                        showMsg(CodeUtil.hex2str(mergeCacheData), darkColor);
+                        mUser.setFingerById(CodeUtil.getData(mergeCacheData), mFingerId);
+                        if (dialog.isVisible()) {
+                            dialog.setFingerColor(mFingerId);
+                        }
+                        EventBus.getDefault().post(new GetFingerEvent());
                         break;
                     default:
                         showMsg(reMsgSb.toString(), greenColor);
@@ -582,10 +608,10 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
         addPrintCache("Customer: " + username);
         addPrintCache("Item    Qty Price Amount");
         addPrintCache("........................");
-        addPrintCache("381853  2   4     8     ");
-        addPrintCache("334153  3   7     21    ");
+        addPrintCache("381853  2   4$    8$    ");
+        addPrintCache("334153  3   7$    21$   ");
         addPrintCache("........................");
-        addPrintCache("Pay Amount        29    ");
+        addPrintCache("Pay Amount        29$   ");
 
         printCache();
     }
@@ -614,15 +640,56 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
     void onUserManage() {
         llButtons.setVisibility(View.GONE);
         flMain.setVisibility(View.VISIBLE);
+        svMessage.setVisibility(View.GONE);
         getFragmentManager().beginTransaction().replace(R.id.fl_main, userListFragment).commit();
     }
 
-
     @Override
-    public void onFragmentInteraction(Uri uri) {
-
+    public void onRegFinger(User user, int fingerId) {
+        mUser = user;
+        mFingerId = fingerId;
+        getFinger(OrderCode.CMD_GET_FINGER);
     }
 
+    private void verify(byte[] fingerData) {
+        Observable
+                .just(fingerData)
+                .map(new Function<byte[], User>() {
+                    @Override
+                    public User apply(byte[] bytes) throws Exception {
+                        return searchUserFinger(bytes);
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<User>() {
+                    @Override
+                    public void accept(User user) throws Exception {
+                        printTest(user.getName());
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        showMsg("No user match", redColor);
+                    }
+                });
+    }
 
+    private User searchUserFinger(byte[] fingerData) {
+        List<User> userList = BTFP_App.getInstance().getDaoSession().getUserDao().loadAll();
+        for (int i = 0; i < userList.size(); i ++) {
+            for (int j = 1; j <= 10; j++) {
+                byte[] userFinger = userList.get(i).getFingerById(j);
+                if (userFinger != null && userFinger.length > 0) {
+                    int re = zzFingerAlg.tmfFingerMatchFMR(userFinger, fingerData,3);
+                    if (re == 0) {
+                        showMsg(userList.get(i).getName() + " matched", greenColor);
+                        return userList.get(i);
+                    }
+                }
+            }
+        }
+        return null;
+    }
 
 }
