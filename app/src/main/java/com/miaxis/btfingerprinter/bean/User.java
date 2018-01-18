@@ -6,6 +6,7 @@ import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Transient;
 
 /**
+ * 用户
  * Created by xu.nan on 2018/1/12.
  */
 
@@ -13,6 +14,7 @@ import org.greenrobot.greendao.annotation.Transient;
 public class User {
     @Id(autoincrement = true)
     private Long id;
+    private String usercode;
     private String name;
     private byte[] finger1;
     private byte[] finger2;
@@ -27,11 +29,13 @@ public class User {
     @Transient
     private boolean isModing;
 
-    @Generated(hash = 588093980)
-    public User(Long id, String name, byte[] finger1, byte[] finger2,
-            byte[] finger3, byte[] finger4, byte[] finger5, byte[] finger6,
-            byte[] finger7, byte[] finger8, byte[] finger9, byte[] finger10) {
+    @Generated(hash = 1252626552)
+    public User(Long id, String usercode, String name, byte[] finger1,
+            byte[] finger2, byte[] finger3, byte[] finger4, byte[] finger5,
+            byte[] finger6, byte[] finger7, byte[] finger8, byte[] finger9,
+            byte[] finger10) {
         this.id = id;
+        this.usercode = usercode;
         this.name = name;
         this.finger1 = finger1;
         this.finger2 = finger2;
@@ -114,7 +118,7 @@ public class User {
                 return finger8;
             case 9:
                 return finger9;
-            case 0:
+            case 10:
                 return finger10;
             default:
                 return null;
@@ -150,7 +154,7 @@ public class User {
             case 9:
                 finger9 = fingerData;
                 break;
-            case 0:
+            case 10:
                 finger10 = fingerData;
                 break;
         }
@@ -259,4 +263,13 @@ public class User {
     public void setModing(boolean moding) {
         isModing = moding;
     }
+
+    public String getUsercode() {
+        return this.usercode;
+    }
+
+    public void setUsercode(String usercode) {
+        this.usercode = usercode;
+    }
+
 }

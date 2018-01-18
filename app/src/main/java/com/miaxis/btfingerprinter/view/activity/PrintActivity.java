@@ -2,7 +2,6 @@ package com.miaxis.btfingerprinter.view.activity;
 
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -30,11 +29,12 @@ import com.miaxis.btfingerprinter.app.BTFP_App;
 import com.miaxis.btfingerprinter.bean.User;
 import com.miaxis.btfingerprinter.event.BtnEnableEvent;
 import com.miaxis.btfingerprinter.event.ClearEvent;
-import com.miaxis.btfingerprinter.event.GetFingerEvent;
+import com.miaxis.btfingerprinter.event.RefreshEvent;
 import com.miaxis.btfingerprinter.event.ScrollPaperEvent;
 import com.miaxis.btfingerprinter.event.SendPackEvent;
 import com.miaxis.btfingerprinter.event.ServiceDiscoveredEvent;
 import com.miaxis.btfingerprinter.event.ShowMsgEvent;
+import com.miaxis.btfingerprinter.event.ToastEvent;
 import com.miaxis.btfingerprinter.utils.BluetoothUUID;
 import com.miaxis.btfingerprinter.utils.CodeUtil;
 import com.miaxis.btfingerprinter.utils.DateUtil;
@@ -47,7 +47,6 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.zz.jni.zzFingerAlg;
 
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import butterknife.BindColor;
@@ -55,8 +54,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.reactivex.Observable;
-import io.reactivex.Observer;
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
@@ -88,6 +85,43 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
     @BindView(R.id.fl_main)
     FrameLayout flMain;
 
+    class BtTimeOutThread extends Thread {
+        @Override
+        public void run() {
+            for (int i=0; i<15; i++) {
+                try {
+                    Thread.sleep(1000);
+                    appendDot();
+                    if (isConnected) {
+                        break;
+                    } else {
+                        EventBus.getDefault().post(new BtnEnableEvent(false));
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (!isConnected) {
+                showMsg("Notify time out, please reboot your bluetooth device", redColor);
+                bleManager.closeBluetoothGatt();
+            } else {
+                EventBus.getDefault().post(new BtnEnableEvent(true));
+            }
+        }
+    }
+
+    private void appendDot() {
+        Observable
+                .just(".")
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<String>() {
+                    @Override
+                    public void accept(String s) throws Exception {
+                        tvMessage.append(s);
+                    }
+                });
+    }
+
     private BleManager bleManager;
     private int curOrderCode;
     ScanResult result;
@@ -103,6 +137,8 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
 
     private zzFingerAlg zzFingerAlg;
 
+    private boolean isConnected;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN | WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
@@ -111,6 +147,7 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
         ButterKnife.bind(this);
         initData();
         initView();
+        new BtTimeOutThread().start();
 
     }
 
@@ -160,6 +197,14 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
         switch (item.getItemId()) {
             case R.id.action_clear:
                 onClearEvent(new ClearEvent(true));
+                break;
+            case R.id.action_delete_all:
+                BTFP_App.getInstance().getDaoSession().getUserDao().deleteAll();
+
+                if (userListFragment.isVisible()) {
+                    EventBus.getDefault().post(new RefreshEvent(true));
+                }
+
                 break;
         }
         return true;
@@ -296,6 +341,9 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
             case 0x63:
                 reMsgSb.append("Generate Feature Fail");
                 return false;
+            case 0x29:
+                reMsgSb.append("Time out");
+                return false;
         }
         return true;
     }
@@ -340,10 +388,11 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
             @Override
             public void onInitiatedResult(boolean result) {
                 if (result) {
-                    showMsg("Notify Initialization Succeed", greenColor);
+                    showMsg("Notify Initialization Succeeded", greenColor);
                 } else {
                     showMsg("Notify Initialization Failed", redColor);
                 }
+                isConnected = result;
                 enableBtns(result);
             }
 
@@ -421,11 +470,21 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
             @Override
             public void onClick(View v) {
                 String username = dialog.getUsername();
-                if (!TextUtils.isEmpty(username)) {
-                    mUser.setName(dialog.getUsername());
-                    BTFP_App.getInstance().getDaoSession().getUserDao().insert(mUser);
-                    dialog.dismiss();
+                String usercode = dialog.getUsercode();
+                if (TextUtils.isEmpty(username)) {
+                    return;
                 }
+                if (TextUtils.isEmpty(usercode)) {
+                    return;
+                }
+                StringBuilder codeSb = new StringBuilder(usercode);
+                if (!checkUsercode(codeSb)) {
+                    return;
+                }
+                mUser.setName(username);
+                mUser.setUsercode(codeSb.toString());
+                BTFP_App.getInstance().getDaoSession().getUserDao().insert(mUser);
+                dialog.dismiss();
             }
         });
 
@@ -446,7 +505,30 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
         });
 
         dialog.setCancelable(false);
+        if (dialog.isVisible()) {
+            return;
+        }
         dialog.show(getFragmentManager(), "Reg");
+    }
+
+    private boolean checkUsercode(StringBuilder codeSb) {
+        if (codeSb.length() < 8) {
+            int insL = 8 - codeSb.length();
+            for (int i=0; i < insL; i++) {
+                codeSb.insert(0, "0");
+            }
+        }
+        List<User> allUsers = BTFP_App.getInstance().getDaoSession().getUserDao().loadAll();
+        if (allUsers == null || allUsers.size() == 0) {
+            return true;
+        }
+        for (int i = 0; i < allUsers.size(); i ++) {
+            if (TextUtils.equals(codeSb.toString(), allUsers.get(i).getUsercode())) {
+                EventBus.getDefault().post(new ToastEvent("Usercode exists"));
+                return false;
+            }
+        }
+        return true;
     }
 
     @OnClick(R.id.btn_search_finger)
@@ -525,7 +607,6 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
 
         if (hasEnd) {
             StringBuilder reMsgSb = new StringBuilder();
-
             byte[] mergeCacheData = CodeUtil.mergeRetBytes(cacheData);
             if (CodeUtil.getXorCheckCode(mergeCacheData) != mergeCacheData[mergeCacheData.length - 2]) {
                 showMsg("Check Code Error", redColor);
@@ -535,20 +616,24 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
             if (handleReturnSw1(mergeCacheData[3], reMsgSb)) {
                 switch (curOrderCode) {
                     case OrderCode.CMD_SEARCH_FINGER:
-                        verify(CodeUtil.getData(mergeCacheData));
+                        byte[] fingerData = CodeUtil.getData(mergeCacheData);
+                        if (fingerData == null || fingerData.length < 1) {
+                            showMsg("No Finger Collected", redColor);
+                        } else {
+                            verify(fingerData);
+                        }
                         break;
                     case OrderCode.CMD_PRINT:
                         printCache();
                         break;
                     case OrderCode.CMD_SCROLL_PAPER:
-
                         break;
                     case OrderCode.CMD_GET_FINGER:
                         mUser.setFingerById(CodeUtil.getData(mergeCacheData), mFingerId);
                         if (dialog.isVisible()) {
                             dialog.setFingerColor(mFingerId);
                         }
-                        EventBus.getDefault().post(new GetFingerEvent());
+                        EventBus.getDefault().post(new RefreshEvent(false));
                         break;
                     default:
                         showMsg(reMsgSb.toString(), greenColor);
@@ -670,7 +755,7 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
-                        showMsg("No user match", redColor);
+                        showMsg("No user matches", redColor);
                     }
                 });
     }
@@ -683,7 +768,7 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
                 if (userFinger != null && userFinger.length > 0) {
                     int re = zzFingerAlg.tmfFingerMatchFMR(userFinger, fingerData,3);
                     if (re == 0) {
-                        showMsg(userList.get(i).getName() + " matched", greenColor);
+                        showMsg(userList.get(i).getName() + " matches FingerId = " + j, greenColor);
                         return userList.get(i);
                     }
                 }

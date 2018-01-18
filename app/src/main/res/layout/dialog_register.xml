@@ -5,31 +5,30 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <LinearLayout
-        android:orientation="horizontal"
+    <EditText
+        android:id="@+id/et_username"
+        android:hint="Username"
+        android:background="@null"
+        android:textSize="18sp"
+        android:gravity="center"
         android:layout_width="match_parent"
-        android:layout_height="60dp">
+        android:layout_height="50dp" />
 
-        <TextView
-            android:visibility="gone"
-            android:id="@+id/tv_userId"
-            android:hint="ID"
-            android:textSize="20sp"
-            android:gravity="center"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="match_parent" />
+    <View
+        android:background="@color/gray_light"
+        android:layout_width="match_parent"
+        android:layout_height="1px"/>
 
-        <EditText
-            android:id="@+id/et_username"
-            android:hint="Username"
-            android:background="@null"
-            android:gravity="center"
-            android:layout_weight="3"
-            android:layout_width="0dp"
-            android:layout_height="match_parent" />
-
-    </LinearLayout>
+    <EditText
+        android:id="@+id/et_usercode"
+        android:hint="Please enter 8-digit numbers"
+        android:maxLength="8"
+        android:textSize="16sp"
+        android:inputType="number"
+        android:background="@null"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="50dp" />
 
     <View
         android:background="@color/gray_light"

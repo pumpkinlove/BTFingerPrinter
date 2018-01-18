@@ -6,8 +6,13 @@
     <item
         android:id="@+id/action_clear"
         app:showAsAction="always"
-        android:icon="@mipmap/clear_info"
-        android:title="Clear"
+        android:title="Clear Info"
+        tools:ignore="AppCompatResource" />
+
+    <item
+        android:id="@+id/action_delete_all"
+        app:showAsAction="always"
+        android:title="Delete All Users"
         tools:ignore="AppCompatResource" />
 
 </menu>

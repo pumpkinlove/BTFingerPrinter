@@ -96,6 +96,7 @@ public class MainActivity extends BaseActivity {
             bleManager.enableBluetooth();
             EventBus.getDefault().post(new ToastEvent("Starting Bluetooth..."));
         }
+        bleManager.refreshDeviceCache();
         if (!bleManager.isInScanning()) {
             bleManager.closeBluetoothGatt();
             resultList.clear();

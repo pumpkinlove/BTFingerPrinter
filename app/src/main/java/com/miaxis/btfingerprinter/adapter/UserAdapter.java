@@ -5,10 +5,16 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridLayout;
 import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.miaxis.btfingerprinter.R;
@@ -53,7 +59,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         User user = userList.get(position);
         if (user != null) {
             holder.setIsRecyclable(false);
-            holder.tvUserId.setText(user.getId() + "");
+            holder.tvUsercode.setText(user.getUsercode());
             holder.etUsername.setText(user.getName());
             holder.tvFingerCount.setText(user.getFingerCount() + " finger(s) collected");
             if (user.isModing()) {
@@ -62,6 +68,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
                 holder.btnConfirm.setVisibility(View.VISIBLE);
                 holder.btnCancel.setVisibility(View.VISIBLE);
                 holder.etUsername.setEnabled(true);
+                holder.llDetail.setVisibility(View.VISIBLE);
             } else {
                 holder.btnModify.setVisibility(View.VISIBLE);
                 holder.btnDelete.setVisibility(View.VISIBLE);
@@ -108,8 +115,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.tv_userId)
-        TextView tvUserId;
+        @BindView(R.id.tv_usercode)
+        TextView tvUsercode;
         @BindView(R.id.et_username)
         EditText etUsername;
         @BindView(R.id.btn_modify)
@@ -124,6 +131,10 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         TextView tvFingerCount;
         @BindView(R.id.gl_fingers)
         GridLayout glFinger;
+        @BindView(R.id.ll_detail)
+        LinearLayout llDetail;
+        @BindView(R.id.iv_expand_arrow)
+        ImageView ivExpandArrow;
 
         @BindColor(R.color.blue_band_dark3)
         int colorBlueDark3;
@@ -133,6 +144,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         int colorGreenDark;
 
         private UserManageListener listener;
+        boolean expand = false;
 
         ViewHolder(View view, UserManageListener listener) {
             super(view);
@@ -191,6 +203,29 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
                     Button btnFinger = (Button) glFinger.getChildAt(i);
                     btnFinger.setClickable(false);
                 }
+            }
+        }
+
+        @OnClick(R.id.ll_expand)
+        void onLLUserClick() {
+            if (expand) {
+                Animation rotate = AnimationUtils.loadAnimation(mContext, R.anim.rotate_r);
+                LinearInterpolator interpolator = new LinearInterpolator();  //设置匀速旋转，在xml文件中设置会出现卡顿
+                rotate.setInterpolator(interpolator);
+                rotate.setFillAfter(!rotate.getFillAfter());
+                rotate.setInterpolator(new LinearInterpolator());//设置为线性旋转
+                ivExpandArrow.startAnimation(rotate);  //开始动画
+                llDetail.setVisibility(View.GONE);
+                expand = false;
+            } else {
+                Animation rotate = AnimationUtils.loadAnimation(mContext, R.anim.rotate);
+                LinearInterpolator interpolator = new LinearInterpolator();  //设置匀速旋转，在xml文件中设置会出现卡顿
+                rotate.setInterpolator(interpolator);
+                rotate.setFillAfter(!rotate.getFillAfter());
+                rotate.setInterpolator(new LinearInterpolator());//设置为线性旋转
+                ivExpandArrow.startAnimation(rotate);  //开始动画
+                llDetail.setVisibility(View.VISIBLE);
+                expand = true;
             }
         }
 

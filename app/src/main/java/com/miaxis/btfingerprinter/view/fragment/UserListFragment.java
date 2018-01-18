@@ -5,7 +5,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +13,7 @@ import com.miaxis.btfingerprinter.R;
 import com.miaxis.btfingerprinter.adapter.UserAdapter;
 import com.miaxis.btfingerprinter.app.BTFP_App;
 import com.miaxis.btfingerprinter.bean.User;
-import com.miaxis.btfingerprinter.event.GetFingerEvent;
+import com.miaxis.btfingerprinter.event.RefreshEvent;
 import com.miaxis.btfingerprinter.view.custom.SimpleDialog;
 
 import org.greenrobot.eventbus.EventBus;
@@ -150,12 +149,12 @@ public class UserListFragment extends Fragment {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onGetFingerEvent(GetFingerEvent e) {
-        Log.e("fragment", "getfinger");
-
+    public void onRefreshEvent(RefreshEvent e) {
+        if (e.isReLoadFromDb()) {
+            userList = BTFP_App.getInstance().getDaoSession().getUserDao().loadAll();
+            userAdapter.setUserList(userList);
+        }
         userAdapter.notifyDataSetChanged();
-
-
     }
 
 }

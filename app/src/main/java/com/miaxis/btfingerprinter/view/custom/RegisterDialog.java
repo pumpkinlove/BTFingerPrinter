@@ -29,8 +29,6 @@ public class RegisterDialog extends DialogFragment {
 
 
     Unbinder unbinder;
-    @BindView(R.id.tv_userId)
-    TextView tvUserId;
     @BindView(R.id.et_username)
     EditText etUsername;
     @BindView(R.id.btn_confirm)
@@ -39,6 +37,8 @@ public class RegisterDialog extends DialogFragment {
     Button btnCancel;
     @BindView(R.id.gl_fingers)
     GridLayout glFingers;
+    @BindView(R.id.et_usercode)
+    EditText etUsercode;
 
     private User user;
 
@@ -72,12 +72,16 @@ public class RegisterDialog extends DialogFragment {
         return view;
     }
 
-
+    @Override
+    public void onResume() {
+        super.onResume();
+        etUsername.setText("");
+        etUsercode.setText("");
+    }
 
     private void initView() {
-        etUsername.setText(null);
         int count = glFingers.getChildCount();
-        for (int i=0; i<count; i++) {
+        for (int i = 0; i < count; i++) {
             Button btn = (Button) glFingers.getChildAt(i);
             final int finalI = i;
             btn.setOnClickListener(new View.OnClickListener() {
@@ -112,6 +116,10 @@ public class RegisterDialog extends DialogFragment {
 
     public String getUsername() {
         return etUsername.getText().toString();
+    }
+
+    public String getUsercode() {
+        return etUsercode.getText().toString();
     }
 
     public void setUser(User user) {
