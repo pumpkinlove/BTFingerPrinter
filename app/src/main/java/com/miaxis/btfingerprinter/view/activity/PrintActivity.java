@@ -1,5 +1,6 @@
 package com.miaxis.btfingerprinter.view.activity;
 
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.os.Bundle;
@@ -7,7 +8,6 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -40,6 +40,7 @@ import com.miaxis.btfingerprinter.utils.CodeUtil;
 import com.miaxis.btfingerprinter.utils.DateUtil;
 import com.miaxis.btfingerprinter.utils.OrderCode;
 import com.miaxis.btfingerprinter.view.custom.RegisterDialog;
+import com.miaxis.btfingerprinter.view.custom.SimpleDialog;
 import com.miaxis.btfingerprinter.view.fragment.UserListFragment;
 
 import org.greenrobot.eventbus.EventBus;
@@ -80,18 +81,23 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
     Button btnRegFinger;
     @BindView(R.id.btn_search_finger)
     Button btnSearchFinger;
-    @BindView(R.id.ll_buttons)
-    LinearLayout llButtons;
     @BindView(R.id.fl_main)
     FrameLayout flMain;
+    @BindView(R.id.btn_delete_all)
+    Button btnDeleteAll;
+    @BindView(R.id.ll_button1)
+    LinearLayout llButton1;
+    @BindView(R.id.btn_user_manage)
+    Button btnUserManage;
+    @BindView(R.id.ll_button2)
+    LinearLayout llButton2;
 
     class BtTimeOutThread extends Thread {
         @Override
         public void run() {
-            for (int i=0; i<15; i++) {
+            for (int i = 0; i < 15; i++) {
                 try {
                     Thread.sleep(1000);
-                    appendDot();
                     if (isConnected) {
                         break;
                     } else {
@@ -102,7 +108,8 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
                 }
             }
             if (!isConnected) {
-                showMsg("Notify time out, please reboot your bluetooth device", redColor);
+                showMsg("Notify time out, please reboot your bluetooth device and reconnect", redColor);
+                pd.dismiss();
                 bleManager.closeBluetoothGatt();
             } else {
                 EventBus.getDefault().post(new BtnEnableEvent(true));
@@ -110,16 +117,24 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
         }
     }
 
-    private void appendDot() {
-        Observable
-                .just(".")
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<String>() {
-                    @Override
-                    public void accept(String s) throws Exception {
-                        tvMessage.append(s);
-                    }
-                });
+    private ProgressDialog pd;
+
+    private void connect() {
+        if (result != null) {
+            setTitle(result.getDevice().getName());
+            bleManager.closeBluetoothGatt();
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            bleManager.connectDevice(result, true, callback);
+            showMsg("Connecting...", darkColor);
+            pd.setMessage("Connecting...");
+            pd.show();
+        } else {
+            showMsg("No Device", redColor);
+        }
     }
 
     private BleManager bleManager;
@@ -147,6 +162,7 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
         ButterKnife.bind(this);
         initData();
         initView();
+        connect();
         new BtTimeOutThread().start();
 
     }
@@ -166,23 +182,13 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
         EventBus.getDefault().register(this);
         bleManager = new BleManager(this);
         result = getIntent().getParcelableExtra("ScanResult");
-        if (result != null) {
-            setTitle(result.getDevice().getName());
-            bleManager.closeBluetoothGatt();
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            bleManager.connectDevice(result, true, callback);
-            showMsg("Connecting...", darkColor);
-        } else {
-            showMsg("No Device", redColor);
-        }
+
     }
 
     @Override
     protected void initView() {
+        pd = new ProgressDialog(this);
+        pd.setCancelable(false);
     }
 
     @Override
@@ -198,14 +204,6 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
             case R.id.action_clear:
                 onClearEvent(new ClearEvent(true));
                 break;
-            case R.id.action_delete_all:
-                BTFP_App.getInstance().getDaoSession().getUserDao().deleteAll();
-
-                if (userListFragment.isVisible()) {
-                    EventBus.getDefault().post(new RefreshEvent(true));
-                }
-
-                break;
         }
         return true;
     }
@@ -216,8 +214,10 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
         if (userListFragment.isVisible()) {
             getFragmentManager().beginTransaction().remove(userListFragment).commit();
             flMain.setVisibility(View.GONE);
-            llButtons.setVisibility(View.VISIBLE);
+            llButton1.setVisibility(View.GONE);
+            llButton2.setVisibility(View.VISIBLE);
             svMessage.setVisibility(View.VISIBLE);
+            setTitle(result.getDevice().getName());
         } else {
             super.onBackPressed();
         }
@@ -389,8 +389,10 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
             public void onInitiatedResult(boolean result) {
                 if (result) {
                     showMsg("Notify Initialization Succeeded", greenColor);
+                    pd.dismiss();
                 } else {
                     showMsg("Notify Initialization Failed", redColor);
+
                 }
                 isConnected = result;
                 enableBtns(result);
@@ -464,7 +466,7 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
     }
 
     @OnClick(R.id.btn_reg_finger)
-    void onRegFinger() {
+    void onRegUser() {
         mUser = new User();
         dialog.setConfirmListener(new View.OnClickListener() {
             @Override
@@ -484,6 +486,7 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
                 mUser.setName(username);
                 mUser.setUsercode(codeSb.toString());
                 BTFP_App.getInstance().getDaoSession().getUserDao().insert(mUser);
+                EventBus.getDefault().post(new RefreshEvent(true));
                 dialog.dismiss();
             }
         });
@@ -514,7 +517,7 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
     private boolean checkUsercode(StringBuilder codeSb) {
         if (codeSb.length() < 8) {
             int insL = 8 - codeSb.length();
-            for (int i=0; i < insL; i++) {
+            for (int i = 0; i < insL; i++) {
                 codeSb.insert(0, "0");
             }
         }
@@ -522,7 +525,7 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
         if (allUsers == null || allUsers.size() == 0) {
             return true;
         }
-        for (int i = 0; i < allUsers.size(); i ++) {
+        for (int i = 0; i < allUsers.size(); i++) {
             if (TextUtils.equals(codeSb.toString(), allUsers.get(i).getUsercode())) {
                 EventBus.getDefault().post(new ToastEvent("Usercode exists"));
                 return false;
@@ -723,7 +726,9 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
 
     @OnClick(R.id.btn_user_manage)
     void onUserManage() {
-        llButtons.setVisibility(View.GONE);
+        setTitle(R.string.user_manage);
+        llButton1.setVisibility(View.VISIBLE);
+        llButton2.setVisibility(View.GONE);
         flMain.setVisibility(View.VISIBLE);
         svMessage.setVisibility(View.GONE);
         getFragmentManager().beginTransaction().replace(R.id.fl_main, userListFragment).commit();
@@ -762,11 +767,11 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
 
     private User searchUserFinger(byte[] fingerData) {
         List<User> userList = BTFP_App.getInstance().getDaoSession().getUserDao().loadAll();
-        for (int i = 0; i < userList.size(); i ++) {
+        for (int i = 0; i < userList.size(); i++) {
             for (int j = 1; j <= 10; j++) {
                 byte[] userFinger = userList.get(i).getFingerById(j);
                 if (userFinger != null && userFinger.length > 0) {
-                    int re = zzFingerAlg.tmfFingerMatchFMR(userFinger, fingerData,3);
+                    int re = zzFingerAlg.tmfFingerMatchFMR(userFinger, fingerData, 3);
                     if (re == 0) {
                         showMsg(userList.get(i).getName() + " matches FingerId = " + j, greenColor);
                         return userList.get(i);
@@ -775,6 +780,29 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
             }
         }
         return null;
+    }
+
+    @OnClick(R.id.btn_delete_all)
+    void onDeleteAll() {
+        final SimpleDialog sd = new SimpleDialog();
+        sd.setMessage("Do you want to delete all the users ?");
+        sd.setConfirmListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                BTFP_App.getInstance().getDaoSession().getUserDao().deleteAll();
+                EventBus.getDefault().post(new RefreshEvent(true));
+                sd.dismiss();
+            }
+        });
+
+        sd.setCancelListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sd.dismiss();
+            }
+        });
+        sd.show(getFragmentManager(), "Del all");
+
     }
 
 }

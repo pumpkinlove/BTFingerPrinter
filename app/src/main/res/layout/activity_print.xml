@@ -20,11 +20,6 @@
 
     </ScrollView>
 
-    <View
-        android:background="@color/gray_light"
-        android:layout_width="match_parent"
-        android:layout_height="1px"/>
-
     <FrameLayout
         android:visibility="gone"
         android:id="@+id/fl_main"
@@ -34,21 +29,36 @@
 
     </FrameLayout>
 
-    <View
-        android:background="@color/gray_light"
-        android:layout_width="match_parent"
-        android:layout_height="1px"/>
-
     <LinearLayout
-        android:id="@+id/ll_buttons"
-        android:orientation="vertical"
+        android:visibility="gone"
+        android:id="@+id/ll_button1"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <Button
-            style="@style/button_order"
             android:id="@+id/btn_reg_finger"
-            android:text="@string/register" />
+            android:text="@string/register"
+            style="@style/button_order"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:layout_width="0dp"/>
+
+        <Button
+            android:id="@+id/btn_delete_all"
+            android:text="@string/delete_all"
+            style="@style/button_order"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:layout_width="0dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_button2"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
         <Button
             style="@style/button_order"
@@ -61,6 +71,5 @@
             android:text="@string/user_manage" />
 
     </LinearLayout>
-
 
 </LinearLayout>
