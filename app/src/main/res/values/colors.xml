@@ -21,11 +21,12 @@
     <color name="blue_band_dark3">#9688939e</color>
 
     <color name="green_dark">#007e00</color>
-    <color name="green_light">#2ebf2e</color>
+    <color name="green_light">#7d6fe06f</color>
     <color name="red">#f00</color>
     <color name="orange">#ffa453</color>
     <color name="orange_dark">#ff8d28</color>
 
     <color name="light_red">#da6464</color>
     <color name="light_red2">#ab4d4d</color>
+    <color name="aero">#00ffffff</color>
 </resources>

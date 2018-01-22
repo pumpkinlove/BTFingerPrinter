@@ -10,6 +10,12 @@
         <item name="android:actionMenuTextColor">@color/dark</item>
     </style>
 
+    <declare-styleable name="GifView">
+        <attr name="gif" format="reference" />
+        <attr name="paused" format="boolean" />
+    </declare-styleable>
+
+
     <style name="id_info_tv">
         <item name="android:textSize">13sp</item>
         <item name="android:textColor">@color/dark</item>
@@ -34,5 +40,10 @@
         <item name="android:background">@drawable/white_btn_bg</item>
         <item name="android:textColor">@color/blue_band_dark3</item>
     </style>
+
+
+    <declare-styleable name="CustomTheme">
+        <attr name="gifViewStyle" format="reference" />
+    </declare-styleable>
 
 </resources>

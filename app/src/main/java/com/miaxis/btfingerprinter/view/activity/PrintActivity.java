@@ -41,6 +41,7 @@ import com.miaxis.btfingerprinter.utils.DateUtil;
 import com.miaxis.btfingerprinter.utils.OrderCode;
 import com.miaxis.btfingerprinter.view.custom.RegisterDialog;
 import com.miaxis.btfingerprinter.view.custom.SimpleDialog;
+import com.miaxis.btfingerprinter.view.fragment.UserDetailFragment;
 import com.miaxis.btfingerprinter.view.fragment.UserListFragment;
 
 import org.greenrobot.eventbus.EventBus;
@@ -60,7 +61,7 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
-public class PrintActivity extends BaseActivity implements UserListFragment.OnFragmentInteractionListener {
+public class PrintActivity extends BaseActivity implements UserListFragment.OnFragmentInteractionListener, UserDetailFragment.OnOperatingListener {
 
     private static final String TAG = "PrintActivity";
     private static final byte PROTOCOL_HEAD = 0x02;
@@ -85,37 +86,12 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
     FrameLayout flMain;
     @BindView(R.id.btn_delete_all)
     Button btnDeleteAll;
-    @BindView(R.id.ll_button1)
-    LinearLayout llButton1;
     @BindView(R.id.btn_user_manage)
     Button btnUserManage;
-    @BindView(R.id.ll_button2)
-    LinearLayout llButton2;
-
-    class BtTimeOutThread extends Thread {
-        @Override
-        public void run() {
-            for (int i = 0; i < 15; i++) {
-                try {
-                    Thread.sleep(1000);
-                    if (isConnected) {
-                        break;
-                    } else {
-                        EventBus.getDefault().post(new BtnEnableEvent(false));
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (!isConnected) {
-                showMsg("Notify time out, please reboot your bluetooth device and reconnect", redColor);
-                pd.dismiss();
-                bleManager.closeBluetoothGatt();
-            } else {
-                EventBus.getDefault().post(new BtnEnableEvent(true));
-            }
-        }
-    }
+    @BindView(R.id.ll_reg_del_btn)
+    LinearLayout llRegDelBtn;
+    @BindView(R.id.ll_verify_manage_btn)
+    LinearLayout llVerifyManageBtn;
 
     private ProgressDialog pd;
 
@@ -142,6 +118,7 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
     ScanResult result;
 
     private UserListFragment userListFragment;
+    private UserDetailFragment userDetailFragment;
 
     private byte[] cacheData = new byte[0];
     private String[] cachePrintContent = new String[0];
@@ -211,17 +188,42 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
     @Override
     public void onBackPressed() {
 
-        if (userListFragment.isVisible()) {
-            getFragmentManager().beginTransaction().remove(userListFragment).commit();
-            flMain.setVisibility(View.GONE);
-            llButton1.setVisibility(View.GONE);
-            llButton2.setVisibility(View.VISIBLE);
-            svMessage.setVisibility(View.VISIBLE);
-            setTitle(result.getDevice().getName());
+        if (userDetailFragment != null && userDetailFragment.isVisible()) {
+            switchToUserListFragment();
+        } else if (userListFragment.isVisible()) {
+            removeUserListFragment();
         } else {
             super.onBackPressed();
         }
 
+    }
+
+    private void removeUserListFragment() {
+        getFragmentManager().beginTransaction().remove(userListFragment).commit();
+        flMain.setVisibility(View.GONE);
+        llRegDelBtn.setVisibility(View.GONE);
+        llVerifyManageBtn.setVisibility(View.VISIBLE);
+        svMessage.setVisibility(View.VISIBLE);
+        setTitle(result.getDevice().getName());
+    }
+
+    private void switchToUserListFragment() {
+        getFragmentManager().beginTransaction().replace(R.id.fl_main, userListFragment).commit();
+        flMain.setVisibility(View.VISIBLE);
+        llVerifyManageBtn.setVisibility(View.GONE);
+        llRegDelBtn.setVisibility(View.VISIBLE);
+        svMessage.setVisibility(View.GONE);
+        setTitle(R.string.user_manage);
+    }
+
+    private void switchToUserDetailFragment(User user) {
+        userDetailFragment = UserDetailFragment.newInstance(user);
+        getFragmentManager().beginTransaction().replace(R.id.fl_main, userDetailFragment).commit();
+        flMain.setVisibility(View.VISIBLE);
+        llVerifyManageBtn.setVisibility(View.GONE);
+        llRegDelBtn.setVisibility(View.GONE);
+        svMessage.setVisibility(View.GONE);
+        setTitle(user.getName());
     }
 
     private BleGattCallback callback = new BleGattCallback() {
@@ -726,19 +728,12 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
 
     @OnClick(R.id.btn_user_manage)
     void onUserManage() {
-        setTitle(R.string.user_manage);
-        llButton1.setVisibility(View.VISIBLE);
-        llButton2.setVisibility(View.GONE);
-        flMain.setVisibility(View.VISIBLE);
-        svMessage.setVisibility(View.GONE);
-        getFragmentManager().beginTransaction().replace(R.id.fl_main, userListFragment).commit();
+        switchToUserListFragment();
     }
 
     @Override
-    public void onRegFinger(User user, int fingerId) {
-        mUser = user;
-        mFingerId = fingerId;
-        getFinger(OrderCode.CMD_GET_FINGER);
+    public void toUserDetail(User user) {
+        switchToUserDetailFragment(user);
     }
 
     private void verify(byte[] fingerData) {
@@ -789,9 +784,7 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
         sd.setConfirmListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                BTFP_App.getInstance().getDaoSession().getUserDao().deleteAll();
-                EventBus.getDefault().post(new RefreshEvent(true));
-                sd.dismiss();
+                deleteAll(sd);
             }
         });
 
@@ -805,4 +798,68 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
 
     }
 
+    private void deleteAll(final SimpleDialog sd) {
+        Observable.just(1)
+                .doOnNext(new Consumer<Integer>() {
+                    @Override
+                    public void accept(Integer integer) throws Exception {
+                        BTFP_App.getInstance().getDaoSession().getUserDao().deleteAll();
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<Integer>() {
+                    @Override
+                    public void accept(Integer integer) throws Exception {
+                        EventBus.getDefault().post(new RefreshEvent(true));
+                        sd.dismiss();
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        EventBus.getDefault().post(new ToastEvent("Operation failed"));
+                        sd.dismiss();
+                    }
+                });
+    }
+
+    @Override
+    public void onAddFinger(User user, int fingerId) {
+
+    }
+
+    @Override
+    public void onModFinger(User user, int fingerId) {
+
+    }
+
+    @Override
+    public void onDelFinger(User user, int fingerId) {
+
+    }
+
+    class BtTimeOutThread extends Thread {
+        @Override
+        public void run() {
+            for (int i = 0; i < 15; i++) {
+                try {
+                    Thread.sleep(1000);
+                    if (isConnected) {
+                        break;
+                    } else {
+                        EventBus.getDefault().post(new BtnEnableEvent(false));
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (!isConnected) {
+                showMsg("Notify time out, please reboot your bluetooth device and reconnect", redColor);
+                pd.dismiss();
+                bleManager.closeBluetoothGatt();
+            } else {
+                EventBus.getDefault().post(new BtnEnableEvent(true));
+            }
+        }
+    }
 }

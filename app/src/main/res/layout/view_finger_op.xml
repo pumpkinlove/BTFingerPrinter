@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:id="@+id/ll_finger_op"
+    android:orientation="horizontal"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@drawable/green_gradient_bg"
+    android:layout_width="match_parent"
+    android:layout_height="50dp">
+
+    <TextView
+        android:id="@+id/tv_finger_id"
+        android:text="Finger 1"
+        android:singleLine="true"
+        android:textColor="@color/dark"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp"
+        android:gravity="center_vertical"
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="match_parent" />
+
+    <ImageView
+        android:focusable="true"
+        android:clickable="true"
+        android:id="@+id/iv_add"
+        android:layout_margin="5dp"
+        android:layout_gravity="center"
+        android:background="@drawable/add_btn_bg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <ImageView
+        android:id="@+id/iv_mod"
+        android:layout_margin="5dp"
+        android:layout_gravity="center"
+        android:background="@drawable/mod_btn_bg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <ImageView
+        android:id="@+id/iv_del"
+        android:layout_margin="5dp"
+        android:background="@drawable/del_btn_bg"
+        android:layout_gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+</LinearLayout>

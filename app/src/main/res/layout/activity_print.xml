@@ -31,7 +31,7 @@
 
     <LinearLayout
         android:visibility="gone"
-        android:id="@+id/ll_button1"
+        android:id="@+id/ll_reg_del_btn"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -55,7 +55,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/ll_button2"
+        android:id="@+id/ll_verify_manage_btn"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">

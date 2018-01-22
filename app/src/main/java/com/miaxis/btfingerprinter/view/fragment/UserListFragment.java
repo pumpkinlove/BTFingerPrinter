@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import com.miaxis.btfingerprinter.adapter.UserAdapter;
 import com.miaxis.btfingerprinter.app.BTFP_App;
 import com.miaxis.btfingerprinter.bean.User;
 import com.miaxis.btfingerprinter.event.RefreshEvent;
+import com.miaxis.btfingerprinter.event.ToastEvent;
 import com.miaxis.btfingerprinter.view.custom.SimpleDialog;
 
 import org.greenrobot.eventbus.EventBus;
@@ -70,56 +72,8 @@ public class UserListFragment extends Fragment {
         userList = BTFP_App.getInstance().getDaoSession().getUserDao().loadAll();
         userAdapter = new UserAdapter(userList, getActivity(), new UserAdapter.UserManageListener() {
             @Override
-            public boolean onModify(int position) {
-                userList.get(position).setModing(true);
-                return true;
-            }
-
-            @Override
-            public boolean onDelete(final int position) {
-                final SimpleDialog sd = new SimpleDialog();
-                sd.setMessage("Do you want to delete User " + userList.get(position).getName() + " ? ");
-                sd.setConfirmListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        BTFP_App.getInstance().getDaoSession().getUserDao().delete(userList.get(position));
-                        userList.remove(position);
-                        userAdapter.notifyDataSetChanged();
-                        sd.dismiss();
-
-                    }
-                });
-                sd.setCancelListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        sd.dismiss();
-                    }
-                });
-                sd.show(getFragmentManager(), "delete");
-                return true;
-            }
-
-            @Override
-            public boolean onRegFinger(int position, int fingerId) {
-                mListener.onRegFinger(userList.get(position), fingerId);
-                return true;
-            }
-
-            @Override
-            public boolean onConfirm(int position) {
-                userList.get(position).setModing(false);
-                BTFP_App.getInstance().getDaoSession().getUserDao().save(userList.get(position));
-                userAdapter.notifyDataSetChanged();
-                return true;
-            }
-
-            @Override
-            public boolean onCancel(int position) {
-                userList.get(position).setModing(false);
-                userList = BTFP_App.getInstance().getDaoSession().getUserDao().loadAll();
-                userAdapter.setUserList(userList);
-                userAdapter.notifyDataSetChanged();
-                return true;
+            public void onClick(View view, int position) {
+                mListener.toUserDetail(userList.get(position));
             }
         });
     }
@@ -145,7 +99,6 @@ public class UserListFragment extends Fragment {
                     public void accept(Integer integer) throws Exception {
                         userList = BTFP_App.getInstance().getDaoSession().getUserDao().loadAll();
                         userAdapter.setUserList(userList);
-
                     }
                 })
                 .subscribeOn(Schedulers.io())
@@ -153,7 +106,40 @@ public class UserListFragment extends Fragment {
                 .subscribe(new Consumer<Integer>() {
                     @Override
                     public void accept(Integer integer) throws Exception {
+                        userAdapter.notifyDataSetChanged();
                         srlUser.setRefreshing(false);
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        EventBus.getDefault().post(new ToastEvent("Operation failed"));
+                        srlUser.setRefreshing(false);
+                    }
+                });
+    }
+
+    private void delete(int position, final SimpleDialog sd) {
+        Observable.just(position)
+                .doOnNext(new Consumer<Integer>() {
+                    @Override
+                    public void accept(Integer integer) throws Exception {
+                        BTFP_App.getInstance().getDaoSession().getUserDao().delete(userList.get(integer));
+                        userList.remove(integer);
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<Integer>() {
+                    @Override
+                    public void accept(Integer integer) throws Exception {
+                        userAdapter.notifyDataSetChanged();
+                        sd.dismiss();
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        EventBus.getDefault().post(new ToastEvent("Operation failed"));
+                        sd.dismiss();
                     }
                 });
     }
@@ -183,7 +169,7 @@ public class UserListFragment extends Fragment {
     }
 
     public interface OnFragmentInteractionListener {
-        void onRegFinger(User user, int fingerId);
+        void toUserDetail(User user);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

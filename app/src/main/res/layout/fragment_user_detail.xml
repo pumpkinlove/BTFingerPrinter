@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:paddingStart="15dp"
+            android:paddingEnd="15dp"
+            android:id="@+id/et_username"
+            android:hint="@string/username"
+            android:background="@null"
+            android:enabled="false"
+            android:singleLine="true"
+            android:inputType="textPersonName"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="50dp" />
+
+        <TextView
+            android:paddingStart="15dp"
+            android:paddingEnd="15dp"
+            android:id="@+id/tv_usercode"
+            android:hint="Usercode"
+            android:textSize="16sp"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="50dp" />
+
+        <GridLayout
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:id="@+id/gl_fingers"
+            android:columnCount="2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.miaxis.btfingerprinter.view.custom.FingerOpLayout
+                android:layout_columnWeight="1"/>
+            <com.miaxis.btfingerprinter.view.custom.FingerOpLayout
+                android:layout_columnWeight="1"/>
+            <com.miaxis.btfingerprinter.view.custom.FingerOpLayout
+                android:layout_columnWeight="1"/>
+            <com.miaxis.btfingerprinter.view.custom.FingerOpLayout
+                android:layout_columnWeight="1"/>
+            <com.miaxis.btfingerprinter.view.custom.FingerOpLayout
+                android:layout_columnWeight="1"/>
+            <com.miaxis.btfingerprinter.view.custom.FingerOpLayout
+                android:layout_columnWeight="1"/>
+            <com.miaxis.btfingerprinter.view.custom.FingerOpLayout
+                android:layout_columnWeight="1"/>
+            <com.miaxis.btfingerprinter.view.custom.FingerOpLayout
+                android:layout_columnWeight="1"/>
+            <com.miaxis.btfingerprinter.view.custom.FingerOpLayout
+                android:layout_columnWeight="1"/>
+            <com.miaxis.btfingerprinter.view.custom.FingerOpLayout
+                android:layout_columnWeight="1"/>
+
+        </GridLayout>
+
+        <Button
+            android:id="@+id/btn_delete"
+            android:background="@drawable/white_btn_bg"
+            android:textColor="@color/light_red2"
+            android:text="@string/delete"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="50dp" />
+
+    </LinearLayout>
+
+</FrameLayout>
