@@ -104,17 +104,18 @@ public class FingerOpLayout extends LinearLayout {
         }
     }
 
-    @OnClick(R.id.iv_add)
+    @OnClick(R.id.iv_mod)
     void onModFinger() {
         if (listener != null) {
             listener.onModFinger(user, fingerId);
         }
     }
 
-    @OnClick(R.id.iv_add)
+    @OnClick(R.id.iv_del)
     void onDelFinger() {
         if (listener != null) {
             listener.onDelFinger(user, fingerId);
         }
     }
+
 }

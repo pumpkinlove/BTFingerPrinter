@@ -14,4 +14,5 @@ public interface OrderCode {
     int CMD_PRINT = 5;
     int CMD_SCROLL_PAPER = 6;
     int CMD_GET_FINGER = 7;
+    int CMD_CANCEL_DEVICE = 8;
 }

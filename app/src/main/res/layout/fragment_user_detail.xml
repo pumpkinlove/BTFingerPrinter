@@ -1,77 +1,157 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white">
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/gray_bg">
 
-    <LinearLayout
-        android:orientation="vertical"
+    <android.support.v7.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        app:cardElevation="5dp"
+        app:cardCornerRadius="5dp"
+        app:cardBackgroundColor="@color/white">
 
-        <EditText
-            android:paddingStart="15dp"
-            android:paddingEnd="15dp"
-            android:id="@+id/et_username"
-            android:hint="@string/username"
-            android:background="@null"
-            android:enabled="false"
-            android:singleLine="true"
-            android:inputType="textPersonName"
-            android:gravity="center"
-            android:layout_width="match_parent"
-            android:layout_height="50dp" />
-
-        <TextView
-            android:paddingStart="15dp"
-            android:paddingEnd="15dp"
-            android:id="@+id/tv_usercode"
-            android:hint="Usercode"
-            android:textSize="16sp"
-            android:gravity="center"
-            android:layout_width="match_parent"
-            android:layout_height="50dp" />
-
-        <GridLayout
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="20dp"
-            android:id="@+id/gl_fingers"
-            android:columnCount="2"
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <com.miaxis.btfingerprinter.view.custom.FingerOpLayout
-                android:layout_columnWeight="1"/>
-            <com.miaxis.btfingerprinter.view.custom.FingerOpLayout
-                android:layout_columnWeight="1"/>
-            <com.miaxis.btfingerprinter.view.custom.FingerOpLayout
-                android:layout_columnWeight="1"/>
-            <com.miaxis.btfingerprinter.view.custom.FingerOpLayout
-                android:layout_columnWeight="1"/>
-            <com.miaxis.btfingerprinter.view.custom.FingerOpLayout
-                android:layout_columnWeight="1"/>
-            <com.miaxis.btfingerprinter.view.custom.FingerOpLayout
-                android:layout_columnWeight="1"/>
-            <com.miaxis.btfingerprinter.view.custom.FingerOpLayout
-                android:layout_columnWeight="1"/>
-            <com.miaxis.btfingerprinter.view.custom.FingerOpLayout
-                android:layout_columnWeight="1"/>
-            <com.miaxis.btfingerprinter.view.custom.FingerOpLayout
-                android:layout_columnWeight="1"/>
-            <com.miaxis.btfingerprinter.view.custom.FingerOpLayout
-                android:layout_columnWeight="1"/>
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="50dp">
 
-        </GridLayout>
+                <TextView
+                    android:singleLine="true"
+                    android:paddingStart="15dp"
+                    android:paddingEnd="15dp"
+                    android:gravity="center_vertical"
+                    android:text="@string/username"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent" />
 
-        <Button
-            android:id="@+id/btn_delete"
-            android:background="@drawable/white_btn_bg"
-            android:textColor="@color/light_red2"
-            android:text="@string/delete"
-            android:layout_weight="1"
-            android:layout_width="match_parent"
-            android:layout_height="50dp" />
+                <EditText
+                    android:paddingStart="15dp"
+                    android:paddingEnd="15dp"
+                    android:id="@+id/et_username"
+                    android:hint="@string/username"
+                    android:background="@null"
+                    android:singleLine="true"
+                    android:inputType="textPersonName"
+                    android:gravity="center_vertical"
+                    android:layout_weight="2"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent" />
 
-    </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="50dp">
+
+                <TextView
+                    android:singleLine="true"
+                    android:paddingStart="15dp"
+                    android:paddingEnd="15dp"
+                    android:gravity="center_vertical"
+                    android:text="@string/usercode"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent" />
+
+                <TextView
+                    android:paddingStart="15dp"
+                    android:paddingEnd="15dp"
+                    android:id="@+id/tv_usercode"
+                    android:hint="@string/usercode"
+                    android:textSize="16sp"
+                    android:gravity="center_vertical"
+                    android:layout_weight="2"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp" />
+
+            </LinearLayout>
+
+            <GridLayout
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp"
+                android:id="@+id/gl_fingers"
+                android:columnCount="2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.miaxis.btfingerprinter.view.custom.FingerOpLayout
+                    android:layout_columnWeight="1"/>
+                <com.miaxis.btfingerprinter.view.custom.FingerOpLayout
+                    android:layout_columnWeight="1"/>
+                <com.miaxis.btfingerprinter.view.custom.FingerOpLayout
+                    android:layout_columnWeight="1"/>
+                <com.miaxis.btfingerprinter.view.custom.FingerOpLayout
+                    android:layout_columnWeight="1"/>
+                <com.miaxis.btfingerprinter.view.custom.FingerOpLayout
+                    android:layout_columnWeight="1"/>
+                <com.miaxis.btfingerprinter.view.custom.FingerOpLayout
+                    android:layout_columnWeight="1"/>
+                <com.miaxis.btfingerprinter.view.custom.FingerOpLayout
+                    android:layout_columnWeight="1"/>
+                <com.miaxis.btfingerprinter.view.custom.FingerOpLayout
+                    android:layout_columnWeight="1"/>
+                <com.miaxis.btfingerprinter.view.custom.FingerOpLayout
+                    android:layout_columnWeight="1"/>
+                <com.miaxis.btfingerprinter.view.custom.FingerOpLayout
+                    android:layout_columnWeight="1"/>
+
+            </GridLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <Button
+                    android:id="@+id/btn_save"
+                    android:background="@drawable/blue_btn_bg"
+                    android:textColor="@color/white"
+                    android:text="@string/save"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp" />
+
+                <View
+                    android:background="@color/white"
+                    android:layout_width="1px"
+                    android:layout_height="match_parent"/>
+
+                <Button
+                    android:id="@+id/btn_delete"
+                    android:background="@drawable/blue_btn_bg"
+                    android:textColor="@color/light_red2"
+                    android:text="@string/delete"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp" />
+
+                <View
+                    android:background="@color/white"
+                    android:layout_width="1px"
+                    android:layout_height="match_parent"/>
+
+                <Button
+                    android:id="@+id/btn_cancel"
+                    android:background="@drawable/blue_btn_bg"
+                    android:textColor="@color/white"
+                    android:text="@string/cancel"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </android.support.v7.widget.CardView>
 
 </FrameLayout>

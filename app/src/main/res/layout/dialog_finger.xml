@@ -2,28 +2,111 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:gravity="center"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <com.miaxis.storageroom.view.custom.GifView
+    <com.miaxis.btfingerprinter.view.custom.GifView
         android:id="@+id/gif_finger"
-        android:layout_margin="50dp"
+        android:layout_margin="25dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
     <ImageView
         android:id="@+id/iv_finger_result"
         android:visibility="gone"
-        android:layout_margin="50dp"
+        android:layout_margin="25dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+
+    <View
+        android:background="@color/blue_band_light"
+        android:layout_width="match_parent"
+        android:layout_height="1px"/>
+
+    <LinearLayout
+        android:visibility="gone"
+        android:id="@+id/ll_username"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+
+        <TextView
+            android:background="@color/blue_band_light"
+            android:textColor="@color/white"
+            android:singleLine="true"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:gravity="center_vertical"
+            android:text="@string/username"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:id="@+id/tv_username"
+            android:hint="@string/username"
+            android:singleLine="true"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
+
+    <View
+        android:background="@color/gray_light"
+        android:layout_width="match_parent"
+        android:layout_height="1px"/>
+
+    <LinearLayout
+        android:visibility="gone"
+        android:id="@+id/ll_finger_id"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+
+        <TextView
+            android:background="@color/blue_band_light"
+            android:textColor="@color/white"
+            android:singleLine="true"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:gravity="center_vertical"
+            android:text="@string/finger_id"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:id="@+id/tv_finger_id"
+            android:hint="@string/finger_id"
+            android:textSize="16sp"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="50dp" />
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/tv_show_info"
         android:gravity="center"
-        android:textSize="22sp"
+        android:textSize="18sp"
         android:textColor="@color/blue_band_dark"
         android:layout_width="match_parent"
         android:layout_height="60dp" />
+
+    <Button
+        android:textSize="14sp"
+        android:textColor="@color/white"
+        android:background="@drawable/blue_btn_bg"
+        android:id="@+id/btn_cancel"
+        android:text="@string/cancel"
+        android:layout_width="match_parent"
+        android:layout_height="45dp" />
 
 </LinearLayout>

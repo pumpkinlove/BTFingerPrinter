@@ -181,5 +181,8 @@ public class UserListFragment extends Fragment {
         userAdapter.notifyDataSetChanged();
     }
 
+    public List<User> getUserList() {
+        return userList;
+    }
 
 }

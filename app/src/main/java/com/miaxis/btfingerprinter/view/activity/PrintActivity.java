@@ -18,6 +18,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.clj.fastble.BleManager;
 import com.clj.fastble.conn.BleCharacterCallback;
@@ -39,6 +40,7 @@ import com.miaxis.btfingerprinter.utils.BluetoothUUID;
 import com.miaxis.btfingerprinter.utils.CodeUtil;
 import com.miaxis.btfingerprinter.utils.DateUtil;
 import com.miaxis.btfingerprinter.utils.OrderCode;
+import com.miaxis.btfingerprinter.view.custom.FingerDialog;
 import com.miaxis.btfingerprinter.view.custom.RegisterDialog;
 import com.miaxis.btfingerprinter.view.custom.SimpleDialog;
 import com.miaxis.btfingerprinter.view.fragment.UserDetailFragment;
@@ -94,24 +96,7 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
     LinearLayout llVerifyManageBtn;
 
     private ProgressDialog pd;
-
-    private void connect() {
-        if (result != null) {
-            setTitle(result.getDevice().getName());
-            bleManager.closeBluetoothGatt();
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            bleManager.connectDevice(result, true, callback);
-            showMsg("Connecting...", darkColor);
-            pd.setMessage("Connecting...");
-            pd.show();
-        } else {
-            showMsg("No Device", redColor);
-        }
-    }
+    private FingerDialog fingerDialog;
 
     private BleManager bleManager;
     private int curOrderCode;
@@ -125,7 +110,7 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
 
     private User mUser;
     private int mFingerId;
-    private final RegisterDialog dialog = new RegisterDialog();
+    private final RegisterDialog registerDialog = new RegisterDialog();
 
     private zzFingerAlg zzFingerAlg;
 
@@ -166,6 +151,14 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
     protected void initView() {
         pd = new ProgressDialog(this);
         pd.setCancelable(false);
+        fingerDialog = new FingerDialog();
+        fingerDialog.setCancelListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                cancelDevice();
+                fingerDialog.dismiss();
+            }
+        });
     }
 
     @Override
@@ -196,6 +189,24 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
             super.onBackPressed();
         }
 
+    }
+
+    private void connect() {
+        if (result != null) {
+            setTitle(result.getDevice().getName());
+            bleManager.closeBluetoothGatt();
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            bleManager.connectDevice(result, true, callback);
+            showMsg("Connecting...", darkColor);
+            pd.setMessage("Connecting...");
+            pd.show();
+        } else {
+            showMsg("No Device", redColor);
+        }
     }
 
     private void removeUserListFragment() {
@@ -434,7 +445,6 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
                     }
                 }
             }).start();
-
         }
     }
 
@@ -448,9 +458,6 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
             @Override
             public void onSuccess(BluetoothGattCharacteristic characteristic) {
                 enableBtns(false);
-                if (!orderName.startsWith("Print") && !orderName.startsWith("Scroll Paper")) {
-                    showMsg("Start " + orderName, darkColor);
-                }
             }
 
             @Override
@@ -470,38 +477,41 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
     @OnClick(R.id.btn_reg_finger)
     void onRegUser() {
         mUser = new User();
-        dialog.setConfirmListener(new View.OnClickListener() {
+        registerDialog.setConfirmListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String username = dialog.getUsername();
-                String usercode = dialog.getUsercode();
+                String username = registerDialog.getUsername();
+                String usercode = registerDialog.getUsercode();
                 if (TextUtils.isEmpty(username)) {
+                    EventBus.getDefault().post(new ToastEvent("Username can not be null"));
                     return;
                 }
                 if (TextUtils.isEmpty(usercode)) {
+                    EventBus.getDefault().post(new ToastEvent("Usercode can not be null"));
                     return;
                 }
                 StringBuilder codeSb = new StringBuilder(usercode);
                 if (!checkUsercode(codeSb)) {
+                    EventBus.getDefault().post(new ToastEvent("Usercode exists"));
                     return;
                 }
                 mUser.setName(username);
                 mUser.setUsercode(codeSb.toString());
                 BTFP_App.getInstance().getDaoSession().getUserDao().insert(mUser);
                 EventBus.getDefault().post(new RefreshEvent(true));
-                dialog.dismiss();
+                registerDialog.dismiss();
             }
         });
 
-        dialog.setCancelListener(new View.OnClickListener() {
+        registerDialog.setCancelListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 hideSoftInput(v);
-                dialog.dismiss();
+                registerDialog.dismiss();
             }
         });
 
-        dialog.setRegFingerListener(new RegisterDialog.RegFingerListener() {
+        registerDialog.setRegFingerListener(new RegisterDialog.RegFingerListener() {
             @Override
             public void onRegFinger(int fingerId) {
                 mFingerId = fingerId;
@@ -509,11 +519,11 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
             }
         });
 
-        dialog.setCancelable(false);
-        if (dialog.isVisible()) {
+        registerDialog.setCancelable(false);
+        if (registerDialog.isVisible()) {
             return;
         }
-        dialog.show(getFragmentManager(), "Reg");
+        registerDialog.show(getFragmentManager(), "Reg");
     }
 
     private boolean checkUsercode(StringBuilder codeSb) {
@@ -529,7 +539,6 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
         }
         for (int i = 0; i < allUsers.size(); i++) {
             if (TextUtils.equals(codeSb.toString(), allUsers.get(i).getUsercode())) {
-                EventBus.getDefault().post(new ToastEvent("Usercode exists"));
                 return false;
             }
         }
@@ -542,6 +551,8 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
     }
 
     private void getFinger(int OrderCodeCmd) {
+        fingerDialog.show(getFragmentManager(), "Finger Dialog");
+        fingerDialog.setCancelable(false);
         byte[] reqBytes = new byte[13];
         reqBytes[0] = PROTOCOL_HEAD;
         reqBytes[1] = (byte) 0x00;
@@ -557,6 +568,20 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
         reqBytes[11] = CodeUtil.getXorCheckCode(reqBytes);
         reqBytes[12] = PROTOCOL_END;
         sendOrder(OrderCodeCmd, reqBytes, "Get Finger");
+    }
+
+    private void cancelDevice() {
+        byte[] reqBytes = new byte[9];
+        reqBytes[0] = PROTOCOL_HEAD;
+        reqBytes[1] = (byte) 0x00;
+        reqBytes[2] = (byte) 0x04;
+        reqBytes[3] = (byte) 0x91;
+        reqBytes[4] = (byte) 0x00;
+        reqBytes[5] = (byte) 0x00;
+        reqBytes[6] = (byte) 0x00;
+        reqBytes[7] = CodeUtil.getXorCheckCode(reqBytes);
+        reqBytes[8] = PROTOCOL_END;
+        sendOrder(OrderCode.CMD_CANCEL_DEVICE, reqBytes, "Cancel Device");
     }
 
     private void print(String content, int dataLen) {
@@ -623,10 +648,15 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
                     case OrderCode.CMD_SEARCH_FINGER:
                         byte[] fingerData = CodeUtil.getData(mergeCacheData);
                         if (fingerData == null || fingerData.length < 1) {
-                            showMsg("No Finger Collected", redColor);
+                            showMsg("Get FingerPrints Failed", redColor);
+                            EventBus.getDefault().post(new ToastEvent("Get FingerPrints Failed"));
+                            if (fingerDialog.isVisible()) {
+                                fingerDialog.dismiss();
+                            }
                         } else {
                             verify(fingerData);
                         }
+                        fingerDialog.setCancelable(true);
                         break;
                     case OrderCode.CMD_PRINT:
                         printCache();
@@ -634,11 +664,18 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
                     case OrderCode.CMD_SCROLL_PAPER:
                         break;
                     case OrderCode.CMD_GET_FINGER:
-                        mUser.setFingerById(CodeUtil.getData(mergeCacheData), mFingerId);
-                        if (dialog.isVisible()) {
-                            dialog.setFingerColor(mFingerId);
+                        byte[] tmpFingerData = CodeUtil.getData(mergeCacheData);
+                        if (tmpFingerData == null || tmpFingerData.length < 1) {
+                            showMsg("Get FingerPrints Failed", redColor);
+                            EventBus.getDefault().post(new ToastEvent("Get FingerPrints Failed"));
+                            if (fingerDialog.isVisible()) {
+                                fingerDialog.dismiss();
+                            }
+                        } else {
+                            onGetFinger(tmpFingerData);
                         }
-                        EventBus.getDefault().post(new RefreshEvent(false));
+                        break;
+                    case OrderCode.CMD_CANCEL_DEVICE:
                         break;
                     default:
                         showMsg(reMsgSb.toString(), greenColor);
@@ -646,6 +683,9 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
                 }
             } else {
                 showMsg(reMsgSb.toString(), redColor);
+                if (fingerDialog.isVisible()) {
+                    fingerDialog.dismiss();
+                }
             }
         }
 
@@ -724,6 +764,9 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onScrollPaper(ScrollPaperEvent e) {
         scrollPaper(e.getNum());
+        if (fingerDialog != null && fingerDialog.isVisible()) {
+            fingerDialog.dismiss();
+        }
     }
 
     @OnClick(R.id.btn_user_manage)
@@ -751,11 +794,13 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
                     @Override
                     public void accept(User user) throws Exception {
                         printTest(user.getName());
+                        fingerDialog.setVerifyResult(true, user.getName(), mFingerId);
                     }
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
                         showMsg("No user matches", redColor);
+                        fingerDialog.setVerifyResult(false, "", mFingerId);
                     }
                 });
     }
@@ -769,12 +814,31 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
                     int re = zzFingerAlg.tmfFingerMatchFMR(userFinger, fingerData, 3);
                     if (re == 0) {
                         showMsg(userList.get(i).getName() + " matches FingerId = " + j, greenColor);
+                        mFingerId = j;
                         return userList.get(i);
                     }
                 }
             }
         }
         return null;
+    }
+
+    private boolean searchFingerExist(byte[] fingerData, List<User> userList) {
+//        if (userList == null) {
+//            return false;
+//        }
+//        for (int i = 0; i < userList.size(); i++) {
+//            for (int j = 1; j <= 10; j++) {
+//                byte[] userFinger = userList.get(i).getFingerById(j);
+//                if (userFinger != null && userFinger.length > 0) {
+//                    int re = zzFingerAlg.tmfFingerMatchFMR(userFinger, fingerData, 3);
+//                    if (re == 0) {
+//                        return true;
+//                    }
+//                }
+//            }
+//        }
+        return false;
     }
 
     @OnClick(R.id.btn_delete_all)
@@ -825,17 +889,76 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
 
     @Override
     public void onAddFinger(User user, int fingerId) {
-
+        mUser = user;
+        mFingerId = fingerId;
+        getFinger(OrderCode.CMD_GET_FINGER);
     }
 
     @Override
     public void onModFinger(User user, int fingerId) {
+        mUser = user;
+        mFingerId = fingerId;
+        getFinger(OrderCode.CMD_GET_FINGER);
+    }
+
+    @Override
+    public void onDelFinger(final User user, final int fingerId) {
+        final SimpleDialog sd = new SimpleDialog();
+        sd.setMessage("Do you want to delete the fingerPrint " + fingerId + " ?");
+        sd.setConfirmListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                user.setFingerById(null, fingerId);
+                if (userDetailFragment.isVisible()) {
+                    userDetailFragment.onModify(false, fingerId);
+                }
+                sd.dismiss();
+            }
+        });
+
+        sd.setCancelListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sd.dismiss();
+            }
+        });
+        sd.show(getFragmentManager(), "Del Finger");
 
     }
 
     @Override
-    public void onDelFinger(User user, int fingerId) {
+    public void onSaveUser(User user) {
+        BTFP_App.getInstance().getDaoSession().getUserDao().save(user);
+        EventBus.getDefault().post(new RefreshEvent(true));
+        switchToUserListFragment();
+    }
 
+    @Override
+    public void onCancel() {
+        switchToUserListFragment();
+    }
+
+    @Override
+    public void onDelUser(final User user) {
+        final SimpleDialog sd = new SimpleDialog();
+        sd.setMessage("Do you want to delete User " + user.getName() + " ?");
+        sd.setConfirmListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                BTFP_App.getInstance().getDaoSession().getUserDao().delete(user);
+                EventBus.getDefault().post(new RefreshEvent(true));
+                switchToUserListFragment();
+                sd.dismiss();
+            }
+        });
+
+        sd.setCancelListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sd.dismiss();
+            }
+        });
+        sd.show(getFragmentManager(), "Del User");
     }
 
     class BtTimeOutThread extends Thread {
@@ -861,5 +984,40 @@ public class PrintActivity extends BaseActivity implements UserListFragment.OnFr
                 EventBus.getDefault().post(new BtnEnableEvent(true));
             }
         }
+    }
+
+    private void onGetFinger(final byte[] fingerData) {
+        Observable
+                .just(fingerData)
+                .map(new Function<byte[], Boolean>() {
+                    @Override
+                    public Boolean apply(byte[] fingerData) throws Exception {
+                        List<User> userList = userListFragment.getUserList();
+                        return searchFingerExist(fingerData, userList);
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<Boolean>() {
+                    @Override
+                    public void accept(Boolean fingerExists) throws Exception {
+                        if (fingerExists) {
+                            showMsg("Finger exists", redColor);
+                            Toast.makeText(PrintActivity.this, "Finger Exists", Toast.LENGTH_SHORT).show();
+                        } else {
+                            mUser.setFingerById(fingerData, mFingerId);
+                            if (registerDialog.isVisible()) {
+                                registerDialog.setFingerColor(mFingerId);
+                            }
+                            if (userDetailFragment != null && userDetailFragment.isVisible()) {
+                                userDetailFragment.onModify(true, mFingerId);
+                            }
+                            Toast.makeText(PrintActivity.this, "Get Finger Succeeded", Toast.LENGTH_SHORT).show();
+                        }
+                        if (fingerDialog.isVisible()) {
+                            fingerDialog.dismiss();
+                        }
+                    }
+                });
     }
 }

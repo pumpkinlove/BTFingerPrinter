@@ -2,7 +2,6 @@ package com.miaxis.btfingerprinter.view.fragment;
 
 import android.app.Fragment;
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -16,10 +15,10 @@ import android.widget.TextView;
 import com.miaxis.btfingerprinter.R;
 import com.miaxis.btfingerprinter.bean.User;
 import com.miaxis.btfingerprinter.view.custom.FingerOpLayout;
-import com.miaxis.btfingerprinter.view.custom.SimpleDialog;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 
 public class UserDetailFragment extends Fragment {
@@ -88,6 +87,7 @@ public class UserDetailFragment extends Fragment {
             }
             fol.setOnOperatingListener((OnOperatingListener) getActivity(), i, mUser);
         }
+        etUsername.requestFocus();
     }
 
     @Override
@@ -117,5 +117,31 @@ public class UserDetailFragment extends Fragment {
         void onAddFinger(User user, int fingerId);
         void onModFinger(User user, int fingerId);
         void onDelFinger(User user, int fingerId);
+
+        void onSaveUser(User user);
+        void onCancel();
+        void onDelUser(User user);
     }
+
+    public void onModify(boolean hasFinger, int fingerId) {
+        FingerOpLayout fol = (FingerOpLayout) glFingers.getChildAt(fingerId - 1);
+        fol.setHasFinger(hasFinger);
+    }
+
+    @OnClick(R.id.btn_delete)
+    void onDeleteUser() {
+        ((OnOperatingListener) getActivity()).onDelUser(mUser);
+    }
+
+    @OnClick(R.id.btn_cancel)
+    void onCancel() {
+        ((OnOperatingListener) getActivity()).onCancel();
+    }
+
+    @OnClick(R.id.btn_save)
+    void onSave() {
+        mUser.setName(etUsername.getText().toString());
+        ((OnOperatingListener) getActivity()).onSaveUser(mUser);
+    }
+
 }

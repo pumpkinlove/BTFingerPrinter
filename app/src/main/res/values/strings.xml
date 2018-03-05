@@ -17,4 +17,11 @@
     <string name="username">Username</string>
     <string name="delete_all">Delete All</string>
     <string name="add">Add</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="save">Save</string>
+    <string name="name">Name</string>
+    <string name="usercode">Usercode</string>
+    <string name="finger_id">FingerId</string>
+    <string name="verify_failed">Verify Failed</string>
 </resources>
